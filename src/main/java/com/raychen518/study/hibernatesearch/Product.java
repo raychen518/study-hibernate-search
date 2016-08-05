@@ -1,4 +1,4 @@
-package com.raychen518.study.hibernate;
+package com.raychen518.study.hibernatesearch;
 
 import java.util.Date;
 

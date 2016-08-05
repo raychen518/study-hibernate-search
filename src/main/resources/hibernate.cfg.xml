@@ -55,8 +55,6 @@
         <!-- A directory named as the following "value" attribute will be automatically created when the application starts, at the User Working Directory (System.getProperty("user.dir")). -->
         <property name="hibernate.search.default.indexBase">hibernate.search.test/lucene/indexes</property>
 
-        <mapping resource="Event.hbm.xml" />
-        <mapping resource="Item.hbm.xml" />
         <mapping resource="Product.hbm.xml" />
         <mapping resource="Book.hbm.xml" />
     </session-factory>
