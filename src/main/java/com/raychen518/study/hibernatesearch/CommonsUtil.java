@@ -3,8 +3,16 @@ package com.raychen518.study.hibernatesearch;
 import java.util.Random;
 
 import org.apache.commons.lang3.RandomUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public final class CommonsUtil {
+
+    public static final String SPACE = " ";
+
+    public static final String DELIMITER_LINE_PREFIX_CONNECTOR = " - ";
+
+    public static final String COMPILER_WARNING_NAME_RAW_TYPES = "rawtypes";
+    public static final String COMPILER_WARNING_NAME_UNCHECKED = "unchecked";
 
     private static final String DELIMITER_LINE = "################################################################################";
 
@@ -16,13 +24,26 @@ public final class CommonsUtil {
      * 
      * @param needingUpperBlankLine
      *            Whether the delimiter line needs a upper blank line.
+     * @param prefix
+     *            The delimiter line's prefix. It means there is no prefix if the value is null.
      */
-    public static void printDelimiterLine(boolean needingUpperBlankLine) {
+    public static void printDelimiterLine(boolean needingUpperBlankLine, String prefix) {
         if (needingUpperBlankLine) {
             System.out.println();
         }
 
+        if (StringUtils.isNotBlank(prefix)) {
+            System.out.println(prefix);
+        }
+
         System.out.println(DELIMITER_LINE);
+    }
+
+    /**
+     * Print a delimiter line.
+     */
+    public static void printDelimiterLine() {
+        printDelimiterLine(false, null);
     }
 
     public static Long generateRandomNumber() {

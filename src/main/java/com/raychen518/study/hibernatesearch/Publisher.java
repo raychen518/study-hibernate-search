@@ -20,6 +20,11 @@ public class Publisher {
         this.address = address;
     }
 
+    @Override
+    public String toString() {
+        return "Publisher [id=" + id + ", name=" + name + ", address=" + address + "]";
+    }
+
     public Long getId() {
         return id;
     }

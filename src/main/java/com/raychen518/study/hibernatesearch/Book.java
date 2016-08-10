@@ -21,29 +21,44 @@ public class Book {
     @Id
     private Long id;
 
-    // - The "index" property specifies whether the field value should be indexed.
-    // - The "analyze" property specifies whether the field value should be analyzed.
-    // - The "store" property specifies whether the field value should be stored.
-    // - The "index = Index.YES", "analyze = Analyze.YES" and "store = Store.NO" settings are the default settings for the @Field annotation.
+    /**
+     * <pre>
+     * - The "index" property specifies whether the field value should be indexed.
+     * - The "analyze" property specifies whether the field value should be analyzed.
+     * - The "store" property specifies whether the field value should be stored.
+     * - The "index = Index.YES", "analyze = Analyze.YES" and "store = Store.NO" settings are the default settings for the @Field annotation.
+     * </pre>
+     */
     @Field
     private String isbn;
 
     @Field(store = Store.YES)
     private String name;
 
+    @Field
     private String authorName;
 
     private double price;
 
-    // A custom field bridge implementation - BookIntroBridge is used here to change the intro to be indexed.
+    /**
+     * <pre>
+     * A custom field bridge implementation - BookIntroBridge is used here to change the intro to be indexed.
+     * </pre>
+     */
     @Field(store = Store.YES)
     @FieldBridge(impl = BookIntroBridge.class)
     private String intro;
 
-    // A built-in field bridge implementation - DateBridge is used here to define the Date field's resolution to second instead of the default millisecond.
-    // In other words, the millisecond part of the Date field is ignored in the indexing.
-    // Assuming the number of milliseconds of the Date field is 1259752333267 (2009-12-02 19:12:13.267),
-    // then the Date field's value in the indexes will be 1259752333000 (the millisecond part (267) is ignored).
+    /**
+     * <pre>
+     * A built-in field bridge implementation - DateBridge is used here to define the Date field's resolution to second instead of the default millisecond.
+     * 
+     * In other words, the millisecond part of the Date field is ignored in the indexing here.
+     * 
+     * Assuming the number of milliseconds of the Date field is 1259752333267 (2009-12-02 19:12:13.267),
+     * then the Date field's value in the indexes will be 1259752333000 (the millisecond part (267) is ignored).
+     * </pre>
+     */
     @Field(analyze = Analyze.NO)
     @DateBridge(resolution = Resolution.SECOND)
     private Date publicationDate;

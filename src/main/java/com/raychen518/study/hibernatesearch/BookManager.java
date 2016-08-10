@@ -17,13 +17,27 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 
 public class BookManager {
 
+    private static final String FIELD_NAME_ISBN = "isbn";
+    private static final String FIELD_NAME_NAME = "name";
+    private static final String FIELD_NAME_AUTHOR_NAME = "authorName";
+    private static final String FIELD_NAME_INTRO = "intro";
+
+    private static final String BOOK_ISBN_1 = "1231121234561";
+    private static final String BOOK_ISBN_2 = "1234567890123";
+    private static final String BOOK_ISBN_3 = "3210987654321";
+    private static final String BOOK_COMMON_VALUE = "a1b2c3";
+
     public static void main(String[] args) throws InterruptedException {
         BookManager manager = new BookManager();
+
         manager.startIndexing();
+
         manager.deleteAll();
         manager.saveSome();
         manager.listAll();
+
         manager.searchAsKeywordQuery();
+        manager.searchOnMultipleFields();
     }
 
     private void startIndexing() throws InterruptedException {
@@ -35,7 +49,7 @@ public class BookManager {
         Session session = HibernateUtil.getSessionFactory().openSession();
         session.beginTransaction();
 
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings(CommonsUtil.COMPILER_WARNING_NAME_UNCHECKED)
         List<Book> results = session.createQuery("from Book").list();
 
         for (Book result : results) {
@@ -45,8 +59,6 @@ public class BookManager {
         session.getTransaction().commit();
         session.close();
     }
-
-    private static final String DEFAULT_BOOK_ISBN = "1231121234561";
 
     public void saveSome() {
         Session session = HibernateUtil.getSessionFactory().openSession();
@@ -58,8 +70,28 @@ public class BookManager {
                     generateBookPublisher(session)));
         }
 
-        session.save(new Book(DEFAULT_BOOK_ISBN, generateBookName(), generateBookAuthorName(), generateBookPrice(),
+        session.save(new Book(BOOK_ISBN_1, generateBookName(), generateBookAuthorName(), generateBookPrice(),
                 generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
+                generateBookPublisher(session)));
+
+        session.save(new Book(BOOK_ISBN_2, generateBookName(), generateBookAuthorName(), generateBookPrice(),
+                generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
+                generateBookPublisher(session)));
+
+        session.save(new Book(BOOK_ISBN_3, generateBookName(), generateBookAuthorName(), generateBookPrice(),
+                generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
+                generateBookPublisher(session)));
+
+        session.save(new Book(generateBookIsbn(), BOOK_COMMON_VALUE, generateBookAuthorName(), generateBookPrice(),
+                generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
+                generateBookPublisher(session)));
+
+        session.save(new Book(generateBookIsbn(), generateBookName(), BOOK_COMMON_VALUE, generateBookPrice(),
+                generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
+                generateBookPublisher(session)));
+
+        session.save(new Book(generateBookIsbn(), generateBookName(), generateBookAuthorName(), generateBookPrice(),
+                BOOK_COMMON_VALUE, generateBookPublicationDate(), generateBookAwarded(),
                 generateBookPublisher(session)));
 
         session.getTransaction().commit();
@@ -70,7 +102,7 @@ public class BookManager {
         Session session = HibernateUtil.getSessionFactory().openSession();
         session.beginTransaction();
 
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings(CommonsUtil.COMPILER_WARNING_NAME_UNCHECKED)
         List<Book> queryResults = session.createQuery("from Book").list();
         for (Book queryResult : queryResults) {
             System.out.println(queryResult);
@@ -80,22 +112,115 @@ public class BookManager {
         session.close();
     }
 
+    @SuppressWarnings(CommonsUtil.COMPILER_WARNING_NAME_UNCHECKED)
     private void searchAsKeywordQuery() {
         FullTextSession fullTextSession = Search.getFullTextSession(HibernateUtil.getSessionFactory().openSession());
         fullTextSession.beginTransaction();
 
         QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Book.class).get();
 
-        org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().onField("isbn").matching(DEFAULT_BOOK_ISBN).createQuery();
-        Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+        String delimiterLinePrefixBase = new Object() {
+        }.getClass().getEnclosingMethod().getName();
+        int testCounter = 0;
 
-        CommonsUtil.printDelimiterLine(true);
-        @SuppressWarnings("unchecked")
-        List<Book> queryResults = query.list();
-        for (Book queryResult : queryResults) {
-            System.out.println(queryResult);
+        // =====================================================================
+        // Keyword Query - Normal
+        // =====================================================================
+        {
+            CommonsUtil.printDelimiterLine(true, delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR
+                    + (++testCounter) + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + "Normal");
+
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().onField(FIELD_NAME_ISBN)
+                    .matching(BOOK_ISBN_1).createQuery();
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+
+            List<Book> queryResults = query.list();
+            for (Book queryResult : queryResults) {
+                System.out.println(queryResult);
+            }
+
+            CommonsUtil.printDelimiterLine();
         }
-        CommonsUtil.printDelimiterLine(false);
+
+        // =====================================================================
+        // Keyword Query - Searching Multiple Words on One Field
+        // Join the words using the Space characters, and invoke the "matching"
+        // method with the join result as the parameter.
+        // =====================================================================
+        {
+            CommonsUtil.printDelimiterLine(true,
+                    delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter)
+                            + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + "Searching Multiple Words on One Field");
+
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().onField(FIELD_NAME_ISBN)
+                    .matching(BOOK_ISBN_1 + CommonsUtil.SPACE + BOOK_ISBN_2 + CommonsUtil.SPACE + BOOK_ISBN_3)
+                    .createQuery();
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+
+            List<Book> queryResults = query.list();
+            for (Book queryResult : queryResults) {
+                System.out.println(queryResult);
+            }
+
+            CommonsUtil.printDelimiterLine();
+        }
+
+        fullTextSession.getTransaction().commit();
+    }
+
+    @SuppressWarnings(CommonsUtil.COMPILER_WARNING_NAME_UNCHECKED)
+    private void searchOnMultipleFields() {
+        FullTextSession fullTextSession = Search.getFullTextSession(HibernateUtil.getSessionFactory().openSession());
+        fullTextSession.beginTransaction();
+
+        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Book.class).get();
+
+        String delimiterLinePrefixBase = new Object() {
+        }.getClass().getEnclosingMethod().getName();
+        int testCounter = 0;
+
+        // =====================================================================
+        // Query on Multiple Fields - Using One "onFields" Method
+        // =====================================================================
+        {
+            CommonsUtil.printDelimiterLine(true, delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR
+                    + (++testCounter) + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + "Using One \"onFields\" Method");
+
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword()
+                    .onFields(FIELD_NAME_NAME, FIELD_NAME_AUTHOR_NAME, FIELD_NAME_INTRO).matching(BOOK_COMMON_VALUE)
+                    .createQuery();
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+
+            List<Book> queryResults = query.list();
+            for (Book queryResult : queryResults) {
+                System.out.println(queryResult);
+            }
+
+            CommonsUtil.printDelimiterLine();
+        }
+
+        // =====================================================================
+        // Query on Multiple Fields - Using One "onField" Method and Multiple
+        // "andField" Methods
+        // =====================================================================
+        {
+            CommonsUtil.printDelimiterLine(true,
+                    delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter)
+                            + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR
+                            + "Using One \"onField\" Method and Multiple \"andField\" Methods");
+
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().onField(FIELD_NAME_NAME)
+                    .andField(FIELD_NAME_AUTHOR_NAME).andField(FIELD_NAME_INTRO).matching(BOOK_COMMON_VALUE)
+                    .createQuery();
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+
+            List<Book> queryResults = query.list();
+            for (Book queryResult : queryResults) {
+                System.out.println(queryResult);
+            }
+
+            CommonsUtil.printDelimiterLine();
+        }
 
         fullTextSession.getTransaction().commit();
     }
@@ -136,8 +261,8 @@ public class BookManager {
     }
 
     private static final Publisher generateBookPublisher(Session session) {
-        return session.get(Publisher.class, session.save(new Publisher(RandomStringUtils.randomAlphanumeric(15),
-                RandomStringUtils.randomAlphanumeric(30))));
+        return session.get(Publisher.class, session.save(
+                new Publisher(RandomStringUtils.randomAlphanumeric(15), RandomStringUtils.randomAlphanumeric(30))));
     }
 
 }
