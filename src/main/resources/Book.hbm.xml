@@ -7,7 +7,12 @@
             <generator class="increment" />
         </id>
         <property name="isbn" column="ISBN" />
-        <property name="version" column="VERSION" />
-        <property name="content" column="CONTENT" length="4000" />
+        <property name="name" column="NAME" />
+        <property name="authorName" column="AUTHOR_NAME" />
+        <property name="price" column="PRICE" />
+        <property name="intro" column="INTRO" />
+        <property name="publicationDate" column="PUBLICATION_DATE" />
+        <property name="awarded" column="AWARDED" />
+        <many-to-one name="publisher" column="PUBLISHER_ID" class="com.raychen518.study.hibernatesearch.Publisher" />
     </class>
 </hibernate-mapping>
