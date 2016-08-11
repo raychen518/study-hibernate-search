@@ -25,7 +25,10 @@ public class BookManager {
     private static final String BOOK_ISBN_1 = "1231121234561";
     private static final String BOOK_ISBN_2 = "1234567890123";
     private static final String BOOK_ISBN_3 = "3210987654321";
-    private static final String BOOK_NAME_1 = "Abcdefg";
+    private static final String BOOK_NAME_01 = "Abcdefg";
+    private static final String BOOK_NAME_02 = "abc";
+    private static final String BOOK_NAME_03 = "def";
+    private static final String BOOK_NAME_04 = "ghi";
     private static final String BOOK_NAME_21 = "xax";
     private static final String BOOK_NAME_22 = "xbx";
     private static final String BOOK_NAME_31 = "xxxabc";
@@ -34,6 +37,10 @@ public class BookManager {
     private static final String BOOK_NAME_41 = "x1x2xabc";
     private static final String BOOK_NAME_42 = "x3x4xdef";
     private static final String BOOK_NAME_43 = "x5x6xghi";
+    private static final String BOOK_NAME_51 = "Abc Def Ghi";
+    private static final String BOOK_NAME_52 = "Abc aaa Def Ghi";
+    private static final String BOOK_NAME_53 = "Abc aaa Def bbb Ghi";
+    private static final String BOOK_NAME_54 = "Abc aaa Def bbb ccc Ghi";
     private static final String BOOK_COMMON_VALUE = "a1b2c3";
 
     private static final String MESSAGE_TEXT_NORMAL = "Normal";
@@ -51,6 +58,7 @@ public class BookManager {
         manager.searchAsKeywordQuery();
         manager.searchAsFuzzyQuery();
         manager.searchAsWildcardQuery();
+        manager.searchAsPhraseQuery();
         manager.searchOnMultipleFields();
     }
 
@@ -96,7 +104,19 @@ public class BookManager {
                 generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
                 generateBookPublisher(session)));
 
-        session.save(new Book(generateBookIsbn(), BOOK_NAME_1, generateBookAuthorName(), generateBookPrice(),
+        session.save(new Book(generateBookIsbn(), BOOK_NAME_01, generateBookAuthorName(), generateBookPrice(),
+                generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
+                generateBookPublisher(session)));
+
+        session.save(new Book(generateBookIsbn(), BOOK_NAME_02, generateBookAuthorName(), generateBookPrice(),
+                generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
+                generateBookPublisher(session)));
+
+        session.save(new Book(generateBookIsbn(), BOOK_NAME_03, generateBookAuthorName(), generateBookPrice(),
+                generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
+                generateBookPublisher(session)));
+
+        session.save(new Book(generateBookIsbn(), BOOK_NAME_04, generateBookAuthorName(), generateBookPrice(),
                 generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
                 generateBookPublisher(session)));
 
@@ -129,6 +149,22 @@ public class BookManager {
                 generateBookPublisher(session)));
 
         session.save(new Book(generateBookIsbn(), BOOK_NAME_43, generateBookAuthorName(), generateBookPrice(),
+                generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
+                generateBookPublisher(session)));
+
+        session.save(new Book(generateBookIsbn(), BOOK_NAME_51, generateBookAuthorName(), generateBookPrice(),
+                generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
+                generateBookPublisher(session)));
+
+        session.save(new Book(generateBookIsbn(), BOOK_NAME_52, generateBookAuthorName(), generateBookPrice(),
+                generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
+                generateBookPublisher(session)));
+
+        session.save(new Book(generateBookIsbn(), BOOK_NAME_53, generateBookAuthorName(), generateBookPrice(),
+                generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
+                generateBookPublisher(session)));
+
+        session.save(new Book(generateBookIsbn(), BOOK_NAME_54, generateBookAuthorName(), generateBookPrice(),
                 generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
                 generateBookPublisher(session)));
 
@@ -245,8 +281,8 @@ public class BookManager {
             // For example, here, search by the term "A1cde2g" returns the
             // document containing the term "Abcdefg", although there are 2
             // changes between these 2 terms.
-            String bookName = BOOK_NAME_1.replace(BOOK_NAME_1.charAt(1), '1')
-                    .replace(BOOK_NAME_1.charAt(BOOK_NAME_1.length() - 2), '2');
+            String bookName = BOOK_NAME_01.replace(BOOK_NAME_01.charAt(1), '1')
+                    .replace(BOOK_NAME_01.charAt(BOOK_NAME_01.length() - 2), '2');
             org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().fuzzy().onField(FIELD_NAME_BOOK_NAME)
                     .matching(bookName).createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
@@ -270,7 +306,7 @@ public class BookManager {
             CommonsUtil.printDelimiterLine(true, delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR
                     + (++testCounter) + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + "Specifying Edit Distance");
 
-            String bookName = BOOK_NAME_1.replace(BOOK_NAME_1.charAt(1), '1');
+            String bookName = BOOK_NAME_01.replace(BOOK_NAME_01.charAt(1), '1');
             org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().fuzzy().withEditDistanceUpTo(1)
                     .onField(FIELD_NAME_BOOK_NAME).matching(bookName).createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
@@ -294,7 +330,7 @@ public class BookManager {
                     + (++testCounter) + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + "Specifying Prefix Length");
 
             int prefixLength = 3;
-            String bookName = RandomStringUtils.randomAlphanumeric(prefixLength) + BOOK_NAME_1;
+            String bookName = RandomStringUtils.randomAlphanumeric(prefixLength) + BOOK_NAME_01;
             org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().fuzzy().withPrefixLength(prefixLength)
                     .onField(FIELD_NAME_BOOK_NAME).matching(bookName).createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
@@ -378,6 +414,65 @@ public class BookManager {
             String bookName = "x?x?x*";
             org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().wildcard().onField(FIELD_NAME_BOOK_NAME)
                     .matching(bookName).createQuery();
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            CommonsUtil.showQueryString(query);
+
+            List<Book> queryResults = query.list();
+            for (Book queryResult : queryResults) {
+                System.out.println(queryResult);
+            }
+
+            CommonsUtil.printDelimiterLine();
+        }
+
+        fullTextSession.getTransaction().commit();
+    }
+
+    @SuppressWarnings(CommonsUtil.COMPILER_WARNING_NAME_UNCHECKED)
+    private void searchAsPhraseQuery() {
+        FullTextSession fullTextSession = Search.getFullTextSession(HibernateUtil.getSessionFactory().openSession());
+        fullTextSession.beginTransaction();
+
+        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Book.class).get();
+
+        String delimiterLinePrefixBase = new Object() {
+        }.getClass().getEnclosingMethod().getName();
+        int testCounter = 0;
+
+        // =====================================================================
+        // Phrase Query - Normal
+        // Invoke the phrase() and sentence(...) methods on the query builder.
+        // This kind of query is used to search exact or approximate sentences.
+        // =====================================================================
+        {
+            CommonsUtil.printDelimiterLine(true, delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR
+                    + (++testCounter) + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + MESSAGE_TEXT_NORMAL);
+
+            String bookName = BOOK_NAME_51;
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(FIELD_NAME_BOOK_NAME)
+                    .sentence(bookName).createQuery();
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            CommonsUtil.showQueryString(query);
+
+            List<Book> queryResults = query.list();
+            for (Book queryResult : queryResults) {
+                System.out.println(queryResult);
+            }
+
+            CommonsUtil.printDelimiterLine();
+        }
+
+        // =====================================================================
+        // Phrase Query - Specifying Slop
+        // By specifying the slop, the approximate sentences are also searched.
+        // =====================================================================
+        {
+            CommonsUtil.printDelimiterLine(true, delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR
+                    + (++testCounter) + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + "Specifying Slop");
+
+            String bookName = BOOK_NAME_51;
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().withSlop(2).onField(FIELD_NAME_BOOK_NAME)
+                    .sentence(bookName).createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
             CommonsUtil.showQueryString(query);
 
