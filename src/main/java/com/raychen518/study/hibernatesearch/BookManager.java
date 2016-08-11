@@ -25,10 +25,19 @@ public class BookManager {
     private static final String BOOK_ISBN_1 = "1231121234561";
     private static final String BOOK_ISBN_2 = "1234567890123";
     private static final String BOOK_ISBN_3 = "3210987654321";
-    private static final String BOOK_NAME = "Abcdefg";
+    private static final String BOOK_NAME_1 = "Abcdefg";
+    private static final String BOOK_NAME_21 = "xax";
+    private static final String BOOK_NAME_22 = "xbx";
+    private static final String BOOK_NAME_31 = "xxxabc";
+    private static final String BOOK_NAME_32 = "xxxdef";
+    private static final String BOOK_NAME_33 = "xxxghi";
+    private static final String BOOK_NAME_41 = "x1x2xabc";
+    private static final String BOOK_NAME_42 = "x3x4xdef";
+    private static final String BOOK_NAME_43 = "x5x6xghi";
     private static final String BOOK_COMMON_VALUE = "a1b2c3";
 
     private static final String MESSAGE_TEXT_NORMAL = "Normal";
+    private static final String MESSAGE_TEXT_MISC = "Misc";
 
     public static void main(String[] args) throws InterruptedException {
         BookManager manager = new BookManager();
@@ -41,6 +50,7 @@ public class BookManager {
 
         manager.searchAsKeywordQuery();
         manager.searchAsFuzzyQuery();
+        manager.searchAsWildcardQuery();
         manager.searchOnMultipleFields();
     }
 
@@ -86,7 +96,39 @@ public class BookManager {
                 generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
                 generateBookPublisher(session)));
 
-        session.save(new Book(generateBookIsbn(), BOOK_NAME, generateBookAuthorName(), generateBookPrice(),
+        session.save(new Book(generateBookIsbn(), BOOK_NAME_1, generateBookAuthorName(), generateBookPrice(),
+                generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
+                generateBookPublisher(session)));
+
+        session.save(new Book(generateBookIsbn(), BOOK_NAME_21, generateBookAuthorName(), generateBookPrice(),
+                generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
+                generateBookPublisher(session)));
+
+        session.save(new Book(generateBookIsbn(), BOOK_NAME_22, generateBookAuthorName(), generateBookPrice(),
+                generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
+                generateBookPublisher(session)));
+
+        session.save(new Book(generateBookIsbn(), BOOK_NAME_31, generateBookAuthorName(), generateBookPrice(),
+                generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
+                generateBookPublisher(session)));
+
+        session.save(new Book(generateBookIsbn(), BOOK_NAME_32, generateBookAuthorName(), generateBookPrice(),
+                generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
+                generateBookPublisher(session)));
+
+        session.save(new Book(generateBookIsbn(), BOOK_NAME_33, generateBookAuthorName(), generateBookPrice(),
+                generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
+                generateBookPublisher(session)));
+
+        session.save(new Book(generateBookIsbn(), BOOK_NAME_41, generateBookAuthorName(), generateBookPrice(),
+                generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
+                generateBookPublisher(session)));
+
+        session.save(new Book(generateBookIsbn(), BOOK_NAME_42, generateBookAuthorName(), generateBookPrice(),
+                generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
+                generateBookPublisher(session)));
+
+        session.save(new Book(generateBookIsbn(), BOOK_NAME_43, generateBookAuthorName(), generateBookPrice(),
                 generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
                 generateBookPublisher(session)));
 
@@ -203,8 +245,8 @@ public class BookManager {
             // For example, here, search by the term "A1cde2g" returns the
             // document containing the term "Abcdefg", although there are 2
             // changes between these 2 terms.
-            String bookName = BOOK_NAME.replace(BOOK_NAME.charAt(1), '1')
-                    .replace(BOOK_NAME.charAt(BOOK_NAME.length() - 2), '2');
+            String bookName = BOOK_NAME_1.replace(BOOK_NAME_1.charAt(1), '1')
+                    .replace(BOOK_NAME_1.charAt(BOOK_NAME_1.length() - 2), '2');
             org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().fuzzy().onField(FIELD_NAME_BOOK_NAME)
                     .matching(bookName).createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
@@ -228,7 +270,7 @@ public class BookManager {
             CommonsUtil.printDelimiterLine(true, delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR
                     + (++testCounter) + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + "Specifying Edit Distance");
 
-            String bookName = BOOK_NAME.replace(BOOK_NAME.charAt(1), '1');
+            String bookName = BOOK_NAME_1.replace(BOOK_NAME_1.charAt(1), '1');
             org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().fuzzy().withEditDistanceUpTo(1)
                     .onField(FIELD_NAME_BOOK_NAME).matching(bookName).createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
@@ -252,9 +294,90 @@ public class BookManager {
                     + (++testCounter) + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + "Specifying Prefix Length");
 
             int prefixLength = 3;
-            String bookName = RandomStringUtils.randomAlphanumeric(prefixLength) + BOOK_NAME;
+            String bookName = RandomStringUtils.randomAlphanumeric(prefixLength) + BOOK_NAME_1;
             org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().fuzzy().withPrefixLength(prefixLength)
                     .onField(FIELD_NAME_BOOK_NAME).matching(bookName).createQuery();
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            CommonsUtil.showQueryString(query);
+
+            List<Book> queryResults = query.list();
+            for (Book queryResult : queryResults) {
+                System.out.println(queryResult);
+            }
+
+            CommonsUtil.printDelimiterLine();
+        }
+
+        fullTextSession.getTransaction().commit();
+    }
+
+    @SuppressWarnings(CommonsUtil.COMPILER_WARNING_NAME_UNCHECKED)
+    private void searchAsWildcardQuery() {
+        FullTextSession fullTextSession = Search.getFullTextSession(HibernateUtil.getSessionFactory().openSession());
+        fullTextSession.beginTransaction();
+
+        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Book.class).get();
+
+        String delimiterLinePrefixBase = new Object() {
+        }.getClass().getEnclosingMethod().getName();
+        int testCounter = 0;
+
+        // =====================================================================
+        // Wildcard Query - Using the Question Mark (?)
+        // Invoke the wildcard() method on the query builder.
+        // Note: Wildcard queries do not apply the analyzer on the matching
+        // terms because the risk of "?" or "*" being mangled is too high.
+        // =====================================================================
+        {
+            CommonsUtil.printDelimiterLine(true, delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR
+                    + (++testCounter) + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + "Using the Question Mark (?)");
+
+            String bookName = "x?x";
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().wildcard().onField(FIELD_NAME_BOOK_NAME)
+                    .matching(bookName).createQuery();
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            CommonsUtil.showQueryString(query);
+
+            List<Book> queryResults = query.list();
+            for (Book queryResult : queryResults) {
+                System.out.println(queryResult);
+            }
+
+            CommonsUtil.printDelimiterLine();
+        }
+
+        // =====================================================================
+        // Wildcard Query - Using the Asterisk Mark (*)
+        // <Same as Above>
+        // =====================================================================
+        {
+            CommonsUtil.printDelimiterLine(true, delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR
+                    + (++testCounter) + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + "Using the Asterisk Mark (*)");
+
+            String bookName = "xxx*";
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().wildcard().onField(FIELD_NAME_BOOK_NAME)
+                    .matching(bookName).createQuery();
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            CommonsUtil.showQueryString(query);
+
+            List<Book> queryResults = query.list();
+            for (Book queryResult : queryResults) {
+                System.out.println(queryResult);
+            }
+
+            CommonsUtil.printDelimiterLine();
+        }
+
+        // =====================================================================
+        // Wildcard Query - Misc
+        // =====================================================================
+        {
+            CommonsUtil.printDelimiterLine(true, delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR
+                    + (++testCounter) + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + MESSAGE_TEXT_MISC);
+
+            String bookName = "x?x?x*";
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().wildcard().onField(FIELD_NAME_BOOK_NAME)
+                    .matching(bookName).createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
             CommonsUtil.showQueryString(query);
 
