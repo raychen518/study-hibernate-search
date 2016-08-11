@@ -4,6 +4,7 @@ import java.util.Random;
 
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.Query;
 
 public final class CommonsUtil {
 
@@ -25,7 +26,8 @@ public final class CommonsUtil {
      * @param needingUpperBlankLine
      *            Whether the delimiter line needs a upper blank line.
      * @param prefix
-     *            The delimiter line's prefix. It means there is no prefix if the value is null.
+     *            The delimiter line's prefix. If the value is null, it means
+     *            that the delimiter line has no prefix.
      */
     public static void printDelimiterLine(boolean needingUpperBlankLine, String prefix) {
         if (needingUpperBlankLine) {
@@ -44,6 +46,16 @@ public final class CommonsUtil {
      */
     public static void printDelimiterLine() {
         printDelimiterLine(false, null);
+    }
+
+    /**
+     * Show the query string of a Hibernate Search.
+     * 
+     * @param query
+     *            A Hibernate Search query.
+     */
+    public static void showQueryString(Query query) {
+        System.out.println("Query String: " + query.getQueryString());
     }
 
     public static Long generateRandomNumber() {
