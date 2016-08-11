@@ -23,9 +23,9 @@ public class BookManager {
     private static final String FIELD_NAME_BOOK_PRICE = "price";
     private static final String FIELD_NAME_BOOK_INTRO = "intro";
 
-    private static final String BOOK_ISBN_1 = "1231121234561";
-    private static final String BOOK_ISBN_2 = "1234567890123";
-    private static final String BOOK_ISBN_3 = "3210987654321";
+    private static final String BOOK_ISBN_01 = "1231121234561";
+    private static final String BOOK_ISBN_02 = "1234567890123";
+    private static final String BOOK_ISBN_03 = "3210987654321";
     private static final String BOOK_NAME_01 = "Abcdefg";
     private static final String BOOK_NAME_02 = "abc";
     private static final String BOOK_NAME_03 = "def";
@@ -46,6 +46,9 @@ public class BookManager {
     private static final double BOOK_PRICE_02 = 85.0;
     private static final double BOOK_PRICE_03 = 90.0;
     private static final double BOOK_PRICE_04 = 95.0;
+    private static final String BOOK_INTRO_01 = "XXXXX\r\nXXX key=\"itemA\" value=\"valueA1\" XXX\r\nXXXXX\r\nXXX key=\"itemA\" value=\"valueA2\" XXX\r\nXXXXX\r\nXXX key=\"itemB\" value=\"valueB1\" XXX\r\nXXXXX\r\n";
+    private static final String BOOK_INTRO_02 = "XXXXX\r\nXXX key=\"itemA\" value=\"valueA1\" XXX\r\nXXXXX\r\nXXX key=\"itemB\" value=\"valueB2\" XXX\r\nXXXXX\r\nXXX key=\"itemC\" value=\"valueC1\" XXX\r\nXXXXX\r\n";
+    private static final String BOOK_INTRO_03 = "XXXXX\r\nXXX key=\"itemB\" value=\"valueB3\" XXX\r\nXXXXX\r\nXXX key=\"itemC\" value=\"valueC1\" XXX\r\nXXXXX\r\nXXX key=\"itemC\" value=\"valueC3\" XXX\r\nXXXXX\r\n";
     private static final String BOOK_COMMON_VALUE = "a1b2c3";
 
     private static final String MESSAGE_TEXT_NORMAL = "Normal";
@@ -98,15 +101,15 @@ public class BookManager {
                     generateBookPublisher(session)));
         }
 
-        session.save(new Book(BOOK_ISBN_1, generateBookName(), generateBookAuthorName(), generateBookPrice(),
+        session.save(new Book(BOOK_ISBN_01, generateBookName(), generateBookAuthorName(), generateBookPrice(),
                 generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
                 generateBookPublisher(session)));
 
-        session.save(new Book(BOOK_ISBN_2, generateBookName(), generateBookAuthorName(), generateBookPrice(),
+        session.save(new Book(BOOK_ISBN_02, generateBookName(), generateBookAuthorName(), generateBookPrice(),
                 generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
                 generateBookPublisher(session)));
 
-        session.save(new Book(BOOK_ISBN_3, generateBookName(), generateBookAuthorName(), generateBookPrice(),
+        session.save(new Book(BOOK_ISBN_03, generateBookName(), generateBookAuthorName(), generateBookPrice(),
                 generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
                 generateBookPublisher(session)));
 
@@ -190,6 +193,15 @@ public class BookManager {
                 generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
                 generateBookPublisher(session)));
 
+        session.save(new Book(generateBookIsbn(), generateBookName(), generateBookAuthorName(), generateBookPrice(),
+                BOOK_INTRO_01, generateBookPublicationDate(), generateBookAwarded(), generateBookPublisher(session)));
+
+        session.save(new Book(generateBookIsbn(), generateBookName(), generateBookAuthorName(), generateBookPrice(),
+                BOOK_INTRO_02, generateBookPublicationDate(), generateBookAwarded(), generateBookPublisher(session)));
+
+        session.save(new Book(generateBookIsbn(), generateBookName(), generateBookAuthorName(), generateBookPrice(),
+                BOOK_INTRO_03, generateBookPublicationDate(), generateBookAwarded(), generateBookPublisher(session)));
+
         session.save(new Book(generateBookIsbn(), BOOK_COMMON_VALUE, generateBookAuthorName(), generateBookPrice(),
                 generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
                 generateBookPublisher(session)));
@@ -240,7 +252,7 @@ public class BookManager {
                     + (++testCounter) + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + MESSAGE_TEXT_NORMAL);
 
             org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().onField(FIELD_NAME_BOOK_ISBN)
-                    .matching(BOOK_ISBN_1).createQuery();
+                    .matching(BOOK_ISBN_01).createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
             CommonsUtil.showQueryString(query);
 
@@ -263,7 +275,7 @@ public class BookManager {
                             + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + "Searching Multiple Words on One Field");
 
             org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().onField(FIELD_NAME_BOOK_ISBN)
-                    .matching(BOOK_ISBN_1 + CommonsUtil.SPACE + BOOK_ISBN_2 + CommonsUtil.SPACE + BOOK_ISBN_3)
+                    .matching(BOOK_ISBN_01 + CommonsUtil.SPACE + BOOK_ISBN_02 + CommonsUtil.SPACE + BOOK_ISBN_03)
                     .createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
             CommonsUtil.showQueryString(query);

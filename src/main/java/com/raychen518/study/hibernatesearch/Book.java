@@ -64,6 +64,8 @@ public class Book {
     @DateBridge(resolution = Resolution.SECOND)
     private Date publicationDate;
 
+    @Field(store = Store.YES)
+    @FieldBridge(impl = BookAwardedBridge.class)
     private boolean awarded;
 
     @IndexedEmbedded
