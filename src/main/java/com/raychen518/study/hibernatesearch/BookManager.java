@@ -20,6 +20,7 @@ public class BookManager {
     private static final String FIELD_NAME_BOOK_ISBN = "isbn";
     private static final String FIELD_NAME_BOOK_NAME = "name";
     private static final String FIELD_NAME_BOOK_AUTHOR_NAME = "authorName";
+    private static final String FIELD_NAME_BOOK_PRICE = "price";
     private static final String FIELD_NAME_BOOK_INTRO = "intro";
 
     private static final String BOOK_ISBN_1 = "1231121234561";
@@ -41,6 +42,10 @@ public class BookManager {
     private static final String BOOK_NAME_52 = "Abc aaa Def Ghi";
     private static final String BOOK_NAME_53 = "Abc aaa Def bbb Ghi";
     private static final String BOOK_NAME_54 = "Abc aaa Def bbb ccc Ghi";
+    private static final double BOOK_PRICE_01 = 80.0;
+    private static final double BOOK_PRICE_02 = 85.0;
+    private static final double BOOK_PRICE_03 = 90.0;
+    private static final double BOOK_PRICE_04 = 95.0;
     private static final String BOOK_COMMON_VALUE = "a1b2c3";
 
     private static final String MESSAGE_TEXT_NORMAL = "Normal";
@@ -59,6 +64,7 @@ public class BookManager {
         manager.searchAsFuzzyQuery();
         manager.searchAsWildcardQuery();
         manager.searchAsPhraseQuery();
+        manager.searchAsRangeQuery();
         manager.searchOnMultipleFields();
     }
 
@@ -168,6 +174,22 @@ public class BookManager {
                 generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
                 generateBookPublisher(session)));
 
+        session.save(new Book(generateBookIsbn(), generateBookName(), generateBookAuthorName(), BOOK_PRICE_01,
+                generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
+                generateBookPublisher(session)));
+
+        session.save(new Book(generateBookIsbn(), generateBookName(), generateBookAuthorName(), BOOK_PRICE_02,
+                generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
+                generateBookPublisher(session)));
+
+        session.save(new Book(generateBookIsbn(), generateBookName(), generateBookAuthorName(), BOOK_PRICE_03,
+                generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
+                generateBookPublisher(session)));
+
+        session.save(new Book(generateBookIsbn(), generateBookName(), generateBookAuthorName(), BOOK_PRICE_04,
+                generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
+                generateBookPublisher(session)));
+
         session.save(new Book(generateBookIsbn(), BOOK_COMMON_VALUE, generateBookAuthorName(), generateBookPrice(),
                 generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
                 generateBookPublisher(session)));
@@ -211,7 +233,7 @@ public class BookManager {
 
         // =====================================================================
         // Keyword Query - Normal
-        // Invoke the keyword() method on the query builder.
+        // Invoke the keyword() method.
         // =====================================================================
         {
             CommonsUtil.printDelimiterLine(true, delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR
@@ -270,7 +292,7 @@ public class BookManager {
 
         // =====================================================================
         // Fuzzy Query - Normal
-        // Invoke the fuzzy() method on the query builder.
+        // Invoke the fuzzy() method.
         // =====================================================================
         {
             CommonsUtil.printDelimiterLine(true, delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR
@@ -360,7 +382,7 @@ public class BookManager {
 
         // =====================================================================
         // Wildcard Query - Using the Question Mark (?)
-        // Invoke the wildcard() method on the query builder.
+        // Invoke the wildcard() method.
         // Note: Wildcard queries do not apply the analyzer on the matching
         // terms because the risk of "?" or "*" being mangled is too high.
         // =====================================================================
@@ -441,7 +463,7 @@ public class BookManager {
 
         // =====================================================================
         // Phrase Query - Normal
-        // Invoke the phrase() and sentence(...) methods on the query builder.
+        // Invoke the phrase() and sentence(...) methods.
         // This kind of query is used to search exact or approximate sentences.
         // =====================================================================
         {
@@ -473,6 +495,86 @@ public class BookManager {
             String bookName = BOOK_NAME_51;
             org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().withSlop(2).onField(FIELD_NAME_BOOK_NAME)
                     .sentence(bookName).createQuery();
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            CommonsUtil.showQueryString(query);
+
+            List<Book> queryResults = query.list();
+            for (Book queryResult : queryResults) {
+                System.out.println(queryResult);
+            }
+
+            CommonsUtil.printDelimiterLine();
+        }
+
+        fullTextSession.getTransaction().commit();
+    }
+
+    @SuppressWarnings(CommonsUtil.COMPILER_WARNING_NAME_UNCHECKED)
+    private void searchAsRangeQuery() {
+        FullTextSession fullTextSession = Search.getFullTextSession(HibernateUtil.getSessionFactory().openSession());
+        fullTextSession.beginTransaction();
+
+        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Book.class).get();
+
+        String delimiterLinePrefixBase = new Object() {
+        }.getClass().getEnclosingMethod().getName();
+        int testCounter = 0;
+
+        // =====================================================================
+        // Range Query - Using the From-To Range
+        // Invoke the range(), from(...) and to(...) methods.
+        // Note: The From and To values are both included.
+        // =====================================================================
+        {
+            CommonsUtil.printDelimiterLine(true, delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR
+                    + (++testCounter) + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + "Using the From-To Range");
+
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.range().onField(FIELD_NAME_BOOK_PRICE).from(80.0D)
+                    .to(90.0D).createQuery();
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            CommonsUtil.showQueryString(query);
+
+            List<Book> queryResults = query.list();
+            for (Book queryResult : queryResults) {
+                System.out.println(queryResult);
+            }
+
+            CommonsUtil.printDelimiterLine();
+        }
+
+        // =====================================================================
+        // Range Query - Using the Above Range
+        // Invoke the range() and above(...) methods.
+        // Note: The Above value is included.
+        // =====================================================================
+        {
+            CommonsUtil.printDelimiterLine(true, delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR
+                    + (++testCounter) + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + "Using the Above Range");
+
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.range().onField(FIELD_NAME_BOOK_PRICE)
+                    .above(80.0D).createQuery();
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            CommonsUtil.showQueryString(query);
+
+            List<Book> queryResults = query.list();
+            for (Book queryResult : queryResults) {
+                System.out.println(queryResult);
+            }
+
+            CommonsUtil.printDelimiterLine();
+        }
+
+        // =====================================================================
+        // Range Query - Using the Below Range
+        // Invoke the range() and below(...) methods.
+        // Note: The Below value is included.
+        // =====================================================================
+        {
+            CommonsUtil.printDelimiterLine(true, delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR
+                    + (++testCounter) + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + "Using the Below Range");
+
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.range().onField(FIELD_NAME_BOOK_PRICE)
+                    .below(90.0D).createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
             CommonsUtil.showQueryString(query);
 

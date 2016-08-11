@@ -38,6 +38,7 @@ public class Book {
     @Field
     private String authorName;
 
+    @Field
     private double price;
 
     /**
