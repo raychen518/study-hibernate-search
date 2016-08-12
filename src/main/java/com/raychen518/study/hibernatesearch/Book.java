@@ -5,7 +5,6 @@ import java.util.Date;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
@@ -24,15 +23,21 @@ public class Book {
 
     /**
      * <pre>
+     * Properties of the @Field Annotation
      * - The "index" property specifies whether the field value should be indexed.
      * - The "analyze" property specifies whether the field value should be analyzed.
      * - The "store" property specifies whether the field value should be stored.
-     * - The "index = Index.YES", "analyze = Analyze.YES" and "store = Store.NO" settings are the default settings for the @Field annotation.
+     * - The "index = Index.YES", "analyze = Analyze.YES" and "store = Store.NO" settings are the default settings.
      * </pre>
      */
     @Field
     private String isbn;
 
+    /**
+     * <pre>
+     * To make a field sortable, the @SortableField annotation should be added to that field.
+     * </pre>
+     */
     @Field(store = Store.YES)
     @SortableField
     private String name;
@@ -63,7 +68,7 @@ public class Book {
      * then the Date field's value in the indexes will be 1259752333000 (the millisecond part (267) is ignored).
      * </pre>
      */
-    @Field(analyze = Analyze.NO)
+    @Field
     @DateBridge(resolution = Resolution.SECOND)
     private Date publicationDate;
 
@@ -71,6 +76,13 @@ public class Book {
     @FieldBridge(impl = BookAwardedBridge.class)
     private boolean awarded;
 
+    private String remarks;
+
+    /**
+     * <pre>
+     * To make an associations field to be indexed, the @IndexedEmbedded annotation should be added to that field.
+     * </pre>
+     */
     @IndexedEmbedded
     private Publisher publisher;
 
@@ -158,6 +170,14 @@ public class Book {
 
     public void setAwarded(boolean awarded) {
         this.awarded = awarded;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
     }
 
     public Publisher getPublisher() {

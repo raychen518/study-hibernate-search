@@ -51,7 +51,7 @@ package com.raychen518.study.hibernatesearch;
  *     public class Book {
  *     -------------------------------------------------------------------------
  * 
- * 04. Mark the entity fields as the entity identifiers to be used by Hibernate Search, using the @Id or @DocumentId annotation.
+ * 04. Mark the entity fields to be indexed by Hibernate Search as the entity identifiers, using the @Id or @DocumentId annotation.
  *     Book.java
  *     -------------------------------------------------------------------------
  *-    @Id
@@ -68,7 +68,7 @@ package com.raychen518.study.hibernatesearch;
  *     private String name;
  *     -------------------------------------------------------------------------
  * 
- * 06. (if necessary) Mark the entity associations to be indexed by Hibernate Search, using the @IndexedEmbedded annotation.
+ * 06. (if necessary) Mark the entity fields to be indexed by Hibernate Search as the entity associations, using the @IndexedEmbedded annotation.
  *     Book.java
  *     -------------------------------------------------------------------------
  *-    @IndexedEmbedded
@@ -87,7 +87,15 @@ package com.raychen518.study.hibernatesearch;
  *     private Date publicationDate;
  *     -------------------------------------------------------------------------
  * 
- * 08. Add the process to start the Hibernate Search indexing when the application starts.
+ * 08. (if necessary) Mark the entity fields sortable in Hibernate Search, using the @SortableField annotation.
+ *     Book.java
+ *     -------------------------------------------------------------------------
+ *-    @Field
+ *-    @SortableField
+ *     private double price;
+ *     -------------------------------------------------------------------------
+ * 
+ * 09. Add the process to start the Hibernate Search indexing when the application starts.
  *     BookManager.java
  *     -------------------------------------------------------------------------
  *     public static void main(String[] args) throws InterruptedException {
@@ -102,7 +110,7 @@ package com.raychen518.study.hibernatesearch;
  *     }
  *     -------------------------------------------------------------------------
  * 
- * 09. Use the Hibernate Search or Apache Lucene API to perform the full-text search.
+ * 10. Use the Hibernate Search or Apache Lucene API to perform the full-text search.
  *     BookManager.java
  *     -------------------------------------------------------------------------
  *     private void search() {
