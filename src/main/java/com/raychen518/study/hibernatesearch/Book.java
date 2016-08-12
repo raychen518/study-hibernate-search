@@ -89,8 +89,8 @@ public class Book {
     @Override
     public String toString() {
         return "Book [id=" + id + ", isbn=" + isbn + ", name=" + name + ", authorName=" + authorName + ", price="
-                + price + ", intro=" + intro + ", publicationDate=" + publicationDate + ", awarded=" + awarded
-                + ", publisher=" + publisher + "]";
+                + price + ", intro=" + CommonsUtil.replaceCrLf(intro) + ", publicationDate=" + publicationDate
+                + ", awarded=" + awarded + ", publisher=" + publisher + "]";
     }
 
     public Long getId() {

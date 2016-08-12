@@ -17,12 +17,18 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 
 public class BookManager {
 
+    // =================================
+    // Field Names
+    // =================================
     private static final String FIELD_NAME_BOOK_ISBN = "isbn";
     private static final String FIELD_NAME_BOOK_NAME = "name";
     private static final String FIELD_NAME_BOOK_AUTHOR_NAME = "authorName";
     private static final String FIELD_NAME_BOOK_PRICE = "price";
     private static final String FIELD_NAME_BOOK_INTRO = "intro";
 
+    // =================================
+    // Test Values
+    // =================================
     private static final String BOOK_ISBN_01 = "1231121234561";
     private static final String BOOK_ISBN_02 = "1234567890123";
     private static final String BOOK_ISBN_03 = "3210987654321";
@@ -51,6 +57,29 @@ public class BookManager {
     private static final String BOOK_INTRO_03 = "XXXXX\r\nXXX key=\"itemB\" value=\"valueB3\" XXX\r\nXXXXX\r\nXXX key=\"itemC\" value=\"valueC1\" XXX\r\nXXXXX\r\nXXX key=\"itemC\" value=\"valueC3\" XXX\r\nXXXXX\r\n";
     private static final String BOOK_COMMON_VALUE = "a1b2c3";
 
+    // =================================
+    // Index Names
+    // =================================
+    private static final String INDEX_NAME_A = "itemA";
+    private static final String INDEX_NAME_B = "itemB";
+    private static final String INDEX_NAME_C = "itemC";
+
+    // =================================
+    // Index Values
+    // =================================
+    private static final String INDEX_VALUE_A_1 = "valueA1";
+    private static final String INDEX_VALUE_A_2 = "valueA2";
+    private static final String INDEX_VALUE_A_3 = "valueA3";
+    private static final String INDEX_VALUE_B_1 = "valueB1";
+    private static final String INDEX_VALUE_B_2 = "valueB2";
+    private static final String INDEX_VALUE_B_3 = "valueB3";
+    private static final String INDEX_VALUE_C_1 = "valueC1";
+    private static final String INDEX_VALUE_C_2 = "valueC2";
+    private static final String INDEX_VALUE_C_3 = "valueC3";
+
+    // =================================
+    // Message Texts
+    // =================================
     private static final String MESSAGE_TEXT_NORMAL = "Normal";
     private static final String MESSAGE_TEXT_MISC = "Misc";
 
@@ -69,6 +98,8 @@ public class BookManager {
         manager.searchAsPhraseQuery();
         manager.searchAsRangeQuery();
         manager.searchOnMultipleFields();
+
+        manager.searchByCustomIndexes();
     }
 
     private void startIndexing() throws InterruptedException {
@@ -662,6 +693,182 @@ public class BookManager {
         }
 
         fullTextSession.getTransaction().commit();
+    }
+
+    /**
+     * <pre>
+     * Custom Indexes per Test Values
+     *          Test Document
+     * Index    #1                      #2                      #3
+     * -------------------------------------------------------------------------
+     * itemA    valueA1 valueA2         valueA1                 ----
+     * itemB    valueB1                 valueB2                 valueB3
+     * itemC    ----                    valueC1                 valueC1 valueC3
+     * </pre>
+     */
+    @SuppressWarnings(CommonsUtil.COMPILER_WARNING_NAME_UNCHECKED)
+    private void searchByCustomIndexes() {
+        FullTextSession fullTextSession = Search.getFullTextSession(HibernateUtil.getSessionFactory().openSession());
+        fullTextSession.beginTransaction();
+
+        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Book.class).get();
+
+        String delimiterLinePrefixBase = new Object() {
+        }.getClass().getEnclosingMethod().getName();
+        int testCounter = 0;
+
+        {
+            CommonsUtil.printDelimiterLine(true,
+                    delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
+
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(INDEX_NAME_A)
+                    .sentence(INDEX_VALUE_A_1).createQuery();
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            CommonsUtil.showQueryString(query);
+
+            List<Book> queryResults = query.list();
+            for (Book queryResult : queryResults) {
+                System.out.println(queryResult);
+            }
+
+            CommonsUtil.printDelimiterLine();
+        }
+
+        {
+            CommonsUtil.printDelimiterLine(true,
+                    delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
+
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(INDEX_NAME_A)
+                    .sentence(INDEX_VALUE_A_2).createQuery();
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            CommonsUtil.showQueryString(query);
+
+            List<Book> queryResults = query.list();
+            for (Book queryResult : queryResults) {
+                System.out.println(queryResult);
+            }
+
+            CommonsUtil.printDelimiterLine();
+        }
+
+        {
+            CommonsUtil.printDelimiterLine(true,
+                    delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
+
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(INDEX_NAME_A)
+                    .sentence(INDEX_VALUE_A_3).createQuery();
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            CommonsUtil.showQueryString(query);
+
+            List<Book> queryResults = query.list();
+            for (Book queryResult : queryResults) {
+                System.out.println(queryResult);
+            }
+
+            CommonsUtil.printDelimiterLine();
+        }
+
+        {
+            CommonsUtil.printDelimiterLine(true,
+                    delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
+
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(INDEX_NAME_B)
+                    .sentence(INDEX_VALUE_B_1).createQuery();
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            CommonsUtil.showQueryString(query);
+
+            List<Book> queryResults = query.list();
+            for (Book queryResult : queryResults) {
+                System.out.println(queryResult);
+            }
+
+            CommonsUtil.printDelimiterLine();
+        }
+
+        {
+            CommonsUtil.printDelimiterLine(true,
+                    delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
+
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(INDEX_NAME_B)
+                    .sentence(INDEX_VALUE_B_2).createQuery();
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            CommonsUtil.showQueryString(query);
+
+            List<Book> queryResults = query.list();
+            for (Book queryResult : queryResults) {
+                System.out.println(queryResult);
+            }
+
+            CommonsUtil.printDelimiterLine();
+        }
+
+        {
+            CommonsUtil.printDelimiterLine(true,
+                    delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
+
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(INDEX_NAME_B)
+                    .sentence(INDEX_VALUE_B_3).createQuery();
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            CommonsUtil.showQueryString(query);
+
+            List<Book> queryResults = query.list();
+            for (Book queryResult : queryResults) {
+                System.out.println(queryResult);
+            }
+
+            CommonsUtil.printDelimiterLine();
+        }
+
+        {
+            CommonsUtil.printDelimiterLine(true,
+                    delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
+
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(INDEX_NAME_C)
+                    .sentence(INDEX_VALUE_C_1).createQuery();
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            CommonsUtil.showQueryString(query);
+
+            List<Book> queryResults = query.list();
+            for (Book queryResult : queryResults) {
+                System.out.println(queryResult);
+            }
+
+            CommonsUtil.printDelimiterLine();
+        }
+
+        {
+            CommonsUtil.printDelimiterLine(true,
+                    delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
+
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(INDEX_NAME_C)
+                    .sentence(INDEX_VALUE_C_2).createQuery();
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            CommonsUtil.showQueryString(query);
+
+            List<Book> queryResults = query.list();
+            for (Book queryResult : queryResults) {
+                System.out.println(queryResult);
+            }
+
+            CommonsUtil.printDelimiterLine();
+        }
+
+        {
+            CommonsUtil.printDelimiterLine(true,
+                    delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
+
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(INDEX_NAME_C)
+                    .sentence(INDEX_VALUE_C_3).createQuery();
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            CommonsUtil.showQueryString(query);
+
+            List<Book> queryResults = query.list();
+            for (Book queryResult : queryResults) {
+                System.out.println(queryResult);
+            }
+
+            CommonsUtil.printDelimiterLine();
+        }
     }
 
     private static final String generateBookIsbn() {
