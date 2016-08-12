@@ -12,6 +12,7 @@ import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Resolution;
+import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.annotations.Store;
 
 @Entity
@@ -33,12 +34,14 @@ public class Book {
     private String isbn;
 
     @Field(store = Store.YES)
+    @SortableField
     private String name;
 
     @Field
     private String authorName;
 
     @Field
+    @SortableField
     private double price;
 
     /**
