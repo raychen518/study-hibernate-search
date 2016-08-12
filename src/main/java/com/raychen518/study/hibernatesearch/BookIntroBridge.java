@@ -16,7 +16,8 @@ import org.hibernate.search.bridge.StringBridge;
 
 public class BookIntroBridge implements FieldBridge, StringBridge {
 
-    private static final String STATEMENT_PATTERN = "key=\"(\\S+?)\" value=\"(\\S+?)\"";
+    private static final String PATTERN_STATEMENT = "key=\"(\\S+?)\" value=\"(\\S+?)\"";
+    private static final String PATTERN_DIGIT = "\\d";
 
     /**
      * <pre>
@@ -44,7 +45,7 @@ public class BookIntroBridge implements FieldBridge, StringBridge {
         if (value != null) {
             String bookIntro = (String) value;
 
-            Pattern statementPattern = Pattern.compile(STATEMENT_PATTERN);
+            Pattern statementPattern = Pattern.compile(PATTERN_STATEMENT);
             Matcher statementMatcher = statementPattern.matcher(bookIntro);
             Map<String, Set<String>> statements = new HashMap<>();
 
@@ -61,16 +62,20 @@ public class BookIntroBridge implements FieldBridge, StringBridge {
 
             for (Entry<String, Set<String>> statementEntry : statements.entrySet()) {
                 luceneOptions.addFieldToDocument(statementEntry.getKey(),
-                        StringUtils.join(statementEntry.getValue().toArray(new String[0]), " "), document);
+                        StringUtils.join(statementEntry.getValue().toArray(new String[0]), StringUtils.SPACE),
+                        document);
             }
         }
 
         luceneOptions.addFieldToDocument(name, String.valueOf(value), document);
     }
 
+    // TODO These 2 methods set(...) and objectToString(...) both create
+    // indexes. Is there some wrong here?
+
     @Override
     public String objectToString(Object object) {
-        return (object == null) ? null : object.toString().trim().replaceAll("\\d", "");
+        return (object == null) ? null : object.toString().trim().replaceAll(PATTERN_DIGIT, StringUtils.EMPTY);
     }
 
 }

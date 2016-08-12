@@ -8,8 +8,6 @@ import org.hibernate.Query;
 
 public final class CommonsUtil {
 
-    public static final String SPACE = " ";
-
     public static final String DELIMITER_LINE_PREFIX_CONNECTOR = " - ";
 
     public static final String COMPILER_WARNING_NAME_RAW_TYPES = "rawtypes";

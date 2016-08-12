@@ -9,6 +9,7 @@ import java.util.Random;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.search.FullTextSession;
@@ -306,7 +307,7 @@ public class BookManager {
                             + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + "Searching Multiple Words on One Field");
 
             org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().onField(FIELD_NAME_BOOK_ISBN)
-                    .matching(BOOK_ISBN_01 + CommonsUtil.SPACE + BOOK_ISBN_02 + CommonsUtil.SPACE + BOOK_ISBN_03)
+                    .matching(BOOK_ISBN_01 + StringUtils.SPACE + BOOK_ISBN_02 + StringUtils.SPACE + BOOK_ISBN_03)
                     .createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
             CommonsUtil.showQueryString(query);
