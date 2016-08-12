@@ -49,10 +49,12 @@ public class BookManager {
     private static final String BOOK_NAME_52 = "Abc aaa Def Ghi";
     private static final String BOOK_NAME_53 = "Abc aaa Def bbb Ghi";
     private static final String BOOK_NAME_54 = "Abc aaa Def bbb ccc Ghi";
+    private static final String BOOK_AUTHOR_NAME_01 = generateBookAuthorName();
     private static final double BOOK_PRICE_01 = 80.0;
     private static final double BOOK_PRICE_02 = 85.0;
     private static final double BOOK_PRICE_03 = 90.0;
     private static final double BOOK_PRICE_04 = 95.0;
+    private static final double BOOK_PRICE_11 = generateBookPrice();
     private static final String BOOK_INTRO_01 = "XXXXX\r\nXXX key=\"itemA\" value=\"valueA1\" XXX\r\nXXXXX\r\nXXX key=\"itemA\" value=\"valueA2\" XXX\r\nXXXXX\r\nXXX key=\"itemB\" value=\"valueB1\" XXX\r\nXXXXX\r\n";
     private static final String BOOK_INTRO_02 = "XXXXX\r\nXXX key=\"itemA\" value=\"valueA1\" XXX\r\nXXXXX\r\nXXX key=\"itemB\" value=\"valueB2\" XXX\r\nXXXXX\r\nXXX key=\"itemC\" value=\"valueC1\" XXX\r\nXXXXX\r\n";
     private static final String BOOK_INTRO_03 = "XXXXX\r\nXXX key=\"itemB\" value=\"valueB3\" XXX\r\nXXXXX\r\nXXX key=\"itemC\" value=\"valueC1\" XXX\r\nXXXXX\r\nXXX key=\"itemC\" value=\"valueC3\" XXX\r\nXXXXX\r\n";
@@ -68,15 +70,15 @@ public class BookManager {
     // =================================
     // Index Values
     // =================================
-    private static final String INDEX_VALUE_A_1 = "valueA1";
-    private static final String INDEX_VALUE_A_2 = "valueA2";
-    private static final String INDEX_VALUE_A_3 = "valueA3";
-    private static final String INDEX_VALUE_B_1 = "valueB1";
-    private static final String INDEX_VALUE_B_2 = "valueB2";
-    private static final String INDEX_VALUE_B_3 = "valueB3";
-    private static final String INDEX_VALUE_C_1 = "valueC1";
-    private static final String INDEX_VALUE_C_2 = "valueC2";
-    private static final String INDEX_VALUE_C_3 = "valueC3";
+    private static final String INDEX_VALUE_A1 = "valueA1";
+    private static final String INDEX_VALUE_A2 = "valueA2";
+    private static final String INDEX_VALUE_A3 = "valueA3";
+    private static final String INDEX_VALUE_B1 = "valueB1";
+    private static final String INDEX_VALUE_B2 = "valueB2";
+    private static final String INDEX_VALUE_B3 = "valueB3";
+    private static final String INDEX_VALUE_C1 = "valueC1";
+    private static final String INDEX_VALUE_C2 = "valueC2";
+    private static final String INDEX_VALUE_C3 = "valueC3";
 
     // =================================
     // Message Texts
@@ -98,8 +100,9 @@ public class BookManager {
         manager.searchAsWildcardQuery();
         manager.searchAsPhraseQuery();
         manager.searchAsRangeQuery();
-        manager.searchOnMultipleFields();
 
+        manager.searchOnMultipleFields();
+        manager.searchUsingCombinedQueries();
         manager.searchByCustomIndexes();
     }
 
@@ -209,6 +212,10 @@ public class BookManager {
                 generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
                 generateBookPublisher(session)));
 
+        session.save(new Book(generateBookIsbn(), generateBookName(), BOOK_AUTHOR_NAME_01, generateBookPrice(),
+                generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
+                generateBookPublisher(session)));
+
         session.save(new Book(generateBookIsbn(), generateBookName(), generateBookAuthorName(), BOOK_PRICE_01,
                 generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
                 generateBookPublisher(session)));
@@ -222,6 +229,10 @@ public class BookManager {
                 generateBookPublisher(session)));
 
         session.save(new Book(generateBookIsbn(), generateBookName(), generateBookAuthorName(), BOOK_PRICE_04,
+                generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
+                generateBookPublisher(session)));
+
+        session.save(new Book(generateBookIsbn(), generateBookName(), generateBookAuthorName(), BOOK_PRICE_11,
                 generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
                 generateBookPublisher(session)));
 
@@ -244,6 +255,10 @@ public class BookManager {
 
         session.save(new Book(generateBookIsbn(), generateBookName(), generateBookAuthorName(), generateBookPrice(),
                 BOOK_COMMON_VALUE, generateBookPublicationDate(), generateBookAwarded(),
+                generateBookPublisher(session)));
+
+        session.save(new Book(generateBookIsbn(), generateBookName(), BOOK_AUTHOR_NAME_01, BOOK_PRICE_11,
+                generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
                 generateBookPublisher(session)));
 
         session.getTransaction().commit();
@@ -276,7 +291,7 @@ public class BookManager {
         int testCounter = 0;
 
         // =====================================================================
-        // Keyword Query - Normal
+        // Normal
         // Invoke the keyword() method.
         // =====================================================================
         {
@@ -297,7 +312,7 @@ public class BookManager {
         }
 
         // =====================================================================
-        // Keyword Query - Searching Multiple Words on One Field
+        // Searching Multiple Words on One Field
         // Join every 2 words by 1 space and use the join result as the
         // matching() method's parameter.
         // =====================================================================
@@ -335,7 +350,7 @@ public class BookManager {
         int testCounter = 0;
 
         // =====================================================================
-        // Fuzzy Query - Normal
+        // Normal
         // Invoke the fuzzy() method.
         // =====================================================================
         {
@@ -363,7 +378,7 @@ public class BookManager {
         }
 
         // =====================================================================
-        // Fuzzy Query - Specifying Edit Distance
+        // Specifying Edit Distance
         // Invoke the withEditDistanceUpTo(...) method.
         // Note: The withThreshold(...) method is deprecated now and replaced
         // with the withEditDistanceUpTo(...) method.
@@ -387,10 +402,10 @@ public class BookManager {
         }
 
         // =====================================================================
-        // Fuzzy Query - Specifying Prefix Length
+        // Specifying Prefix Length
         // Invoke the withPrefixLength(...) method.
         // =====================================================================
-        // TODO Fuzzy Query - Specifying Prefix Length cannot be tested.
+        // TODO Specifying Prefix Length cannot be tested.
         {
             CommonsUtil.printDelimiterLine(true, delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR
                     + (++testCounter) + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + "Specifying Prefix Length");
@@ -425,7 +440,7 @@ public class BookManager {
         int testCounter = 0;
 
         // =====================================================================
-        // Wildcard Query - Using the Question Mark (?)
+        // Using the Question Mark (?)
         // Invoke the wildcard() method.
         // Note: Wildcard queries do not apply the analyzer on the matching
         // terms because the risk of "?" or "*" being mangled is too high.
@@ -449,7 +464,7 @@ public class BookManager {
         }
 
         // =====================================================================
-        // Wildcard Query - Using the Asterisk Mark (*)
+        // Using the Asterisk Mark (*)
         // <Same as Above>
         // =====================================================================
         {
@@ -471,7 +486,7 @@ public class BookManager {
         }
 
         // =====================================================================
-        // Wildcard Query - Misc
+        // Misc
         // =====================================================================
         {
             CommonsUtil.printDelimiterLine(true, delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR
@@ -506,7 +521,7 @@ public class BookManager {
         int testCounter = 0;
 
         // =====================================================================
-        // Phrase Query - Normal
+        // Normal
         // Invoke the phrase() and sentence(...) methods.
         // This kind of query is used to search exact or approximate sentences.
         // =====================================================================
@@ -529,7 +544,7 @@ public class BookManager {
         }
 
         // =====================================================================
-        // Phrase Query - Specifying Slop
+        // Specifying Slop
         // By specifying the slop, the approximate sentences are also searched.
         // =====================================================================
         {
@@ -565,7 +580,7 @@ public class BookManager {
         int testCounter = 0;
 
         // =====================================================================
-        // Range Query - Using the From-To Range
+        // Using the From-To Range
         // Invoke the range(), from(...) and to(...) methods.
         // Note: The From and To values are both included.
         // =====================================================================
@@ -587,7 +602,7 @@ public class BookManager {
         }
 
         // =====================================================================
-        // Range Query - Using the Above Range
+        // Using the Above Range
         // Invoke the range() and above(...) methods.
         // Note: The Above value is included.
         // =====================================================================
@@ -609,7 +624,7 @@ public class BookManager {
         }
 
         // =====================================================================
-        // Range Query - Using the Below Range
+        // Using the Below Range
         // Invoke the range() and below(...) methods.
         // Note: The Below value is included.
         // =====================================================================
@@ -645,7 +660,7 @@ public class BookManager {
         int testCounter = 0;
 
         // =====================================================================
-        // Query on Multiple Fields - Using One onFields() Method
+        // Using One onFields() Method
         // =====================================================================
         {
             CommonsUtil.printDelimiterLine(true, delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR
@@ -666,8 +681,7 @@ public class BookManager {
         }
 
         // =====================================================================
-        // Query on Multiple Fields - Using One onField() Method and Multiple
-        // andField() Methods
+        // Using One onField() Method and Multiple andField() Methods
         // This approach is used when one field should be treated differently
         // from other fields (such as setting a different boost value).
         // =====================================================================
@@ -682,6 +696,140 @@ public class BookManager {
             org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().onField(FIELD_NAME_BOOK_NAME)
                     .andField(FIELD_NAME_BOOK_AUTHOR_NAME).boostedTo(5).andField(FIELD_NAME_BOOK_INTRO)
                     .matching(BOOK_COMMON_VALUE).createQuery();
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            CommonsUtil.showQueryString(query);
+
+            List<Book> queryResults = query.list();
+            for (Book queryResult : queryResults) {
+                System.out.println(queryResult);
+            }
+
+            CommonsUtil.printDelimiterLine();
+        }
+
+        fullTextSession.getTransaction().commit();
+    }
+
+    @SuppressWarnings(CommonsUtil.COMPILER_WARNING_NAME_UNCHECKED)
+    private void searchUsingCombinedQueries() {
+        FullTextSession fullTextSession = Search.getFullTextSession(HibernateUtil.getSessionFactory().openSession());
+        fullTextSession.beginTransaction();
+
+        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Book.class).get();
+
+        String delimiterLinePrefixBase = new Object() {
+        }.getClass().getEnclosingMethod().getName();
+        int testCounter = 0;
+
+        // =====================================================================
+        // Using the must(...) Method for an AND Query
+        // =====================================================================
+        {
+            CommonsUtil.printDelimiterLine(true,
+                    delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter)
+                            + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR
+                            + "Using the must(...) Method for an AND Query");
+
+            org.apache.lucene.search.Query luceneSubquery1 = queryBuilder.keyword().onField(FIELD_NAME_BOOK_AUTHOR_NAME)
+                    .matching(BOOK_AUTHOR_NAME_01).createQuery();
+            org.apache.lucene.search.Query luceneSubquery2 = queryBuilder.keyword().onField(FIELD_NAME_BOOK_PRICE)
+                    .matching(BOOK_PRICE_11).createQuery();
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.bool().must(luceneSubquery1).must(luceneSubquery2)
+                    .createQuery();
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            CommonsUtil.showQueryString(query);
+
+            List<Book> queryResults = query.list();
+            for (Book queryResult : queryResults) {
+                System.out.println(queryResult);
+            }
+
+            CommonsUtil.printDelimiterLine();
+        }
+
+        // =====================================================================
+        // Using the should(...) Method for an OR Query
+        // =====================================================================
+        {
+            CommonsUtil.printDelimiterLine(true,
+                    delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter)
+                            + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR
+                            + "Using the should(...) Method for an OR Query");
+
+            org.apache.lucene.search.Query luceneSubquery1 = queryBuilder.keyword().onField(FIELD_NAME_BOOK_AUTHOR_NAME)
+                    .matching(BOOK_AUTHOR_NAME_01).createQuery();
+            org.apache.lucene.search.Query luceneSubquery2 = queryBuilder.keyword().onField(FIELD_NAME_BOOK_PRICE)
+                    .matching(BOOK_PRICE_11).createQuery();
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.bool().should(luceneSubquery1)
+                    .should(luceneSubquery2).createQuery();
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            CommonsUtil.showQueryString(query);
+
+            List<Book> queryResults = query.list();
+            for (Book queryResult : queryResults) {
+                System.out.println(queryResult);
+            }
+
+            CommonsUtil.printDelimiterLine();
+        }
+
+        // =====================================================================
+        // Using the not() Method for a NOT Query
+        // =====================================================================
+        {
+            CommonsUtil.printDelimiterLine(true,
+                    delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter)
+                            + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + "Using the not() Method for a NOT Query");
+
+            org.apache.lucene.search.Query luceneSubquery1 = queryBuilder.keyword().onField(FIELD_NAME_BOOK_AUTHOR_NAME)
+                    .matching(BOOK_AUTHOR_NAME_01).createQuery();
+            org.apache.lucene.search.Query luceneSubquery2 = queryBuilder.keyword().onField(FIELD_NAME_BOOK_PRICE)
+                    .matching(BOOK_PRICE_11).createQuery();
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.bool().must(luceneSubquery1).must(luceneSubquery2)
+                    .not().createQuery();
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            CommonsUtil.showQueryString(query);
+
+            List<Book> queryResults = query.list();
+            for (Book queryResult : queryResults) {
+                System.out.println(queryResult);
+            }
+
+            CommonsUtil.printDelimiterLine();
+        }
+
+        // =====================================================================
+        // Using the all() Method for an ALL Query
+        // =====================================================================
+        {
+            CommonsUtil.printDelimiterLine(true,
+                    delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter)
+                            + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + "Using the all() Method for an ALL Query");
+
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.all().createQuery();
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            CommonsUtil.showQueryString(query);
+
+            List<Book> queryResults = query.list();
+            for (Book queryResult : queryResults) {
+                System.out.println(queryResult);
+            }
+
+            CommonsUtil.printDelimiterLine();
+        }
+
+        // =====================================================================
+        // Using the except(...) Method to Exclude Results
+        // =====================================================================
+        {
+            CommonsUtil.printDelimiterLine(true,
+                    delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter)
+                            + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR
+                            + "Using the except(...) Method to Exclude Results");
+
+            org.apache.lucene.search.Query luceneSubquery = queryBuilder.range().onField(FIELD_NAME_BOOK_PRICE)
+                    .below(BOOK_PRICE_02).createQuery();
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.all().except(luceneSubquery).createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
             CommonsUtil.showQueryString(query);
 
@@ -723,7 +871,7 @@ public class BookManager {
                     delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
 
             org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(INDEX_NAME_A)
-                    .sentence(INDEX_VALUE_A_1).createQuery();
+                    .sentence(INDEX_VALUE_A1).createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
             CommonsUtil.showQueryString(query);
 
@@ -740,7 +888,7 @@ public class BookManager {
                     delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
 
             org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(INDEX_NAME_A)
-                    .sentence(INDEX_VALUE_A_2).createQuery();
+                    .sentence(INDEX_VALUE_A2).createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
             CommonsUtil.showQueryString(query);
 
@@ -757,7 +905,7 @@ public class BookManager {
                     delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
 
             org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(INDEX_NAME_A)
-                    .sentence(INDEX_VALUE_A_3).createQuery();
+                    .sentence(INDEX_VALUE_A3).createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
             CommonsUtil.showQueryString(query);
 
@@ -774,7 +922,7 @@ public class BookManager {
                     delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
 
             org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(INDEX_NAME_B)
-                    .sentence(INDEX_VALUE_B_1).createQuery();
+                    .sentence(INDEX_VALUE_B1).createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
             CommonsUtil.showQueryString(query);
 
@@ -791,7 +939,7 @@ public class BookManager {
                     delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
 
             org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(INDEX_NAME_B)
-                    .sentence(INDEX_VALUE_B_2).createQuery();
+                    .sentence(INDEX_VALUE_B2).createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
             CommonsUtil.showQueryString(query);
 
@@ -808,7 +956,7 @@ public class BookManager {
                     delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
 
             org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(INDEX_NAME_B)
-                    .sentence(INDEX_VALUE_B_3).createQuery();
+                    .sentence(INDEX_VALUE_B3).createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
             CommonsUtil.showQueryString(query);
 
@@ -825,7 +973,7 @@ public class BookManager {
                     delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
 
             org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(INDEX_NAME_C)
-                    .sentence(INDEX_VALUE_C_1).createQuery();
+                    .sentence(INDEX_VALUE_C1).createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
             CommonsUtil.showQueryString(query);
 
@@ -842,7 +990,7 @@ public class BookManager {
                     delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
 
             org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(INDEX_NAME_C)
-                    .sentence(INDEX_VALUE_C_2).createQuery();
+                    .sentence(INDEX_VALUE_C2).createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
             CommonsUtil.showQueryString(query);
 
@@ -859,7 +1007,7 @@ public class BookManager {
                     delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
 
             org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(INDEX_NAME_C)
-                    .sentence(INDEX_VALUE_C_3).createQuery();
+                    .sentence(INDEX_VALUE_C3).createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
             CommonsUtil.showQueryString(query);
 
