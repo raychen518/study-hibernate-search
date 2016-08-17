@@ -95,28 +95,28 @@ public class BookManager {
     // =================================
     // Message Texts
     // =================================
-    private static final String MESSAGE_TEXT_FIELDS_BOOSTED = "Fields Boosted";
-    private static final String MESSAGE_TEXT_FIELDS_NOT_BOOSTED = "Fields Not Boosted";
-    private static final String MESSAGE_TEXT_MISC = "Misc";
     private static final String MESSAGE_TEXT_NORMAL = "Normal";
-    private static final String MESSAGE_TEXT_QUERIES_BOOSTED = "Queries Boosted";
-    private static final String MESSAGE_TEXT_QUERIES_NOT_BOOSTED = "Queries Not Boosted";
     private static final String MESSAGE_TEXT_SEARCHING_MULTIPLE_WORDS_ON_ONE_FIELD = "Searching Multiple Words on One Field";
     private static final String MESSAGE_TEXT_SPECIFYING_EDIT_DISTANCE = "Specifying Edit Distance";
     private static final String MESSAGE_TEXT_SPECIFYING_PREFIX_LENGTH = "Specifying Prefix Length";
+    private static final String MESSAGE_TEXT_USING_THE_QUESTION_MARK = "Using the Question Mark (?)";
+    private static final String MESSAGE_TEXT_USING_THE_ASTERISK_MARK = "Using the Asterisk Mark (*)";
+    private static final String MESSAGE_TEXT_MISC = "Misc";
     private static final String MESSAGE_TEXT_SPECIFYING_SLOP = "Specifying Slop";
+    private static final String MESSAGE_TEXT_USING_THE_FROM_TO_RANGE = "Using the From-To Range";
+    private static final String MESSAGE_TEXT_USING_THE_ABOVE_RANGE = "Using the Above Range";
+    private static final String MESSAGE_TEXT_USING_THE_BELOW_RANGE = "Using the Below Range";
     private static final String MESSAGE_TEXT_USING_ONE_ONFIELDS_METHOD = "Using One onFields() Method";
     private static final String MESSAGE_TEXT_USING_ONE_ONFIELD_METHOD_AND_MULTIPLE_ANDFIELD_METHODS = "Using One onField() Method and Multiple andField() Methods";
-    private static final String MESSAGE_TEXT_USING_THE_ABOVE_RANGE = "Using the Above Range";
-    private static final String MESSAGE_TEXT_USING_THE_ALL_METHOD_FOR_AN_ALL_QUERY = "Using the all() Method for an ALL Query";
-    private static final String MESSAGE_TEXT_USING_THE_ASTERISK_MARK = "Using the Asterisk Mark (*)";
-    private static final String MESSAGE_TEXT_USING_THE_BELOW_RANGE = "Using the Below Range";
-    private static final String MESSAGE_TEXT_USING_THE_EXCEPT_METHOD_TO_EXCLUDE_RESULTS = "Using the except(...) Method to Exclude Results";
-    private static final String MESSAGE_TEXT_USING_THE_FROM_TO_RANGE = "Using the From-To Range";
     private static final String MESSAGE_TEXT_USING_THE_MUST_METHOD_FOR_AN_AND_QUERY = "Using the must(...) Method for an AND Query";
-    private static final String MESSAGE_TEXT_USING_THE_NOT_METHOD_FOR_A_NOT_QUERY = "Using the not() Method for a NOT Query";
-    private static final String MESSAGE_TEXT_USING_THE_QUESTION_MARK = "Using the Question Mark (?)";
     private static final String MESSAGE_TEXT_USING_THE_SHOULD_METHOD_FOR_AN_OR_QUERY = "Using the should(...) Method for an OR Query";
+    private static final String MESSAGE_TEXT_USING_THE_NOT_METHOD_FOR_A_NOT_QUERY = "Using the not() Method for a NOT Query";
+    private static final String MESSAGE_TEXT_USING_THE_ALL_METHOD_FOR_AN_ALL_QUERY = "Using the all() Method for an ALL Query";
+    private static final String MESSAGE_TEXT_USING_THE_EXCEPT_METHOD_TO_EXCLUDE_RESULTS = "Using the except(...) Method to Exclude Results";
+    private static final String MESSAGE_TEXT_QUERIES_NOT_BOOSTED = "Queries Not Boosted";
+    private static final String MESSAGE_TEXT_QUERIES_BOOSTED = "Queries Boosted";
+    private static final String MESSAGE_TEXT_FIELDS_NOT_BOOSTED = "Fields Not Boosted";
+    private static final String MESSAGE_TEXT_FIELDS_BOOSTED = "Fields Boosted";
 
     public static void main(String[] args) throws InterruptedException {
         BookManager manager = new BookManager();
@@ -156,7 +156,7 @@ public class BookManager {
         manager.searchWithQueriesOrFieldsBoosted();
 
         // TODO Add examples about using the following query options.
-        // - boostedTo()
+
         // - withConstantScore()
         // - filteredBy()
         // - ignoreAnalyzer()
