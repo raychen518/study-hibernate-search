@@ -23,6 +23,11 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 public class BookManager {
 
     // =================================
+    // Query Statements
+    // =================================
+    private static final String QUERY_STATEMENT_FROM_BOOK = "from Book";
+
+    // =================================
     // Field Names
     // =================================
     private static final String FIELD_NAME_BOOK_ISBN = "isbn";
@@ -53,16 +58,19 @@ public class BookManager {
     private static final String BOOK_NAME_52 = "Abc aaa Def Ghi";
     private static final String BOOK_NAME_53 = "Abc aaa Def bbb Ghi";
     private static final String BOOK_NAME_54 = "Abc aaa Def bbb ccc Ghi";
+    private static final String BOOK_NAME_61 = generateBookName();
     private static final String BOOK_AUTHOR_NAME_01 = generateBookAuthorName();
     private static final double BOOK_PRICE_01 = 80.0;
     private static final double BOOK_PRICE_02 = 85.0;
     private static final double BOOK_PRICE_03 = 90.0;
     private static final double BOOK_PRICE_04 = 95.0;
     private static final double BOOK_PRICE_11 = generateBookPrice();
+    private static final double BOOK_PRICE_21 = generateBookPrice();
     private static final String BOOK_INTRO_01 = "XXXXX\r\nXXX key=\"itemA\" value=\"valueA1\" XXX\r\nXXXXX\r\nXXX key=\"itemA\" value=\"valueA2\" XXX\r\nXXXXX\r\nXXX key=\"itemB\" value=\"valueB1\" XXX\r\nXXXXX\r\n";
     private static final String BOOK_INTRO_02 = "XXXXX\r\nXXX key=\"itemA\" value=\"valueA1\" XXX\r\nXXXXX\r\nXXX key=\"itemB\" value=\"valueB2\" XXX\r\nXXXXX\r\nXXX key=\"itemC\" value=\"valueC1\" XXX\r\nXXXXX\r\n";
     private static final String BOOK_INTRO_03 = "XXXXX\r\nXXX key=\"itemB\" value=\"valueB3\" XXX\r\nXXXXX\r\nXXX key=\"itemC\" value=\"valueC1\" XXX\r\nXXXXX\r\nXXX key=\"itemC\" value=\"valueC3\" XXX\r\nXXXXX\r\n";
-    private static final String BOOK_COMMON_VALUE = "a1b2c3";
+    private static final String BOOK_COMMON_VALUE_01 = "a1b2c3";
+    private static final String BOOK_COMMON_VALUE_11 = RandomStringUtils.randomAlphabetic(5);
 
     // =================================
     // Index Names
@@ -116,15 +124,16 @@ public class BookManager {
         manager.searchWithPaginationAndSorting();
 
         // =================================================
-        // Search Using Various Query Features
+        // Search Using Query Features
         // =================================================
         manager.searchOnMultipleFields();
         manager.searchUsingCombinedQueries();
         manager.searchByCustomIndexes();
 
         // =================================================
-        // Search Using Various Query Options
+        // Search Using Query Options
         // =================================================
+        manager.searchWithQueriesOrFieldsBoosted();
 
         // TODO Add examples about using the following query options.
         // - boostedTo()
@@ -144,7 +153,7 @@ public class BookManager {
         session.beginTransaction();
 
         @SuppressWarnings(CommonsUtil.COMPILER_WARNING_NAME_UNCHECKED)
-        List<Book> results = session.createQuery("from Book").list();
+        List<Book> results = session.createQuery(QUERY_STATEMENT_FROM_BOOK).list();
 
         for (Book result : results) {
             session.delete(result);
@@ -164,6 +173,8 @@ public class BookManager {
                     generateBookPublisher(session)));
         }
 
+        // ---------------------------------------------------------------------
+
         session.save(new Book(BOOK_ISBN_01, generateBookName(), generateBookAuthorName(), generateBookPrice(),
                 generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
                 generateBookPublisher(session)));
@@ -175,6 +186,8 @@ public class BookManager {
         session.save(new Book(BOOK_ISBN_03, generateBookName(), generateBookAuthorName(), generateBookPrice(),
                 generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
                 generateBookPublisher(session)));
+
+        // ---------------------------------------------------------------------
 
         session.save(new Book(generateBookIsbn(), BOOK_NAME_01, generateBookAuthorName(), generateBookPrice(),
                 generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
@@ -240,9 +253,21 @@ public class BookManager {
                 generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
                 generateBookPublisher(session)));
 
+        session.save(new Book(generateBookIsbn(), BOOK_NAME_61, generateBookAuthorName(), generateBookPrice(),
+                generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
+                generateBookPublisher(session)));
+
+        session.save(new Book(generateBookIsbn(), BOOK_NAME_61, generateBookAuthorName(), generateBookPrice(),
+                generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
+                generateBookPublisher(session)));
+
+        // ---------------------------------------------------------------------
+
         session.save(new Book(generateBookIsbn(), generateBookName(), BOOK_AUTHOR_NAME_01, generateBookPrice(),
                 generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
                 generateBookPublisher(session)));
+
+        // ---------------------------------------------------------------------
 
         session.save(new Book(generateBookIsbn(), generateBookName(), generateBookAuthorName(), BOOK_PRICE_01,
                 generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
@@ -276,6 +301,16 @@ public class BookManager {
                 generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
                 generateBookPublisher(session)));
 
+        session.save(new Book(generateBookIsbn(), generateBookName(), generateBookAuthorName(), BOOK_PRICE_21,
+                generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
+                generateBookPublisher(session)));
+
+        session.save(new Book(generateBookIsbn(), generateBookName(), generateBookAuthorName(), BOOK_PRICE_21,
+                generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
+                generateBookPublisher(session)));
+
+        // ---------------------------------------------------------------------
+
         session.save(new Book(generateBookIsbn(), generateBookName(), generateBookAuthorName(), generateBookPrice(),
                 BOOK_INTRO_01, generateBookPublicationDate(), generateBookAwarded(), generateBookPublisher(session)));
 
@@ -285,17 +320,35 @@ public class BookManager {
         session.save(new Book(generateBookIsbn(), generateBookName(), generateBookAuthorName(), generateBookPrice(),
                 BOOK_INTRO_03, generateBookPublicationDate(), generateBookAwarded(), generateBookPublisher(session)));
 
-        session.save(new Book(generateBookIsbn(), BOOK_COMMON_VALUE, generateBookAuthorName(), generateBookPrice(),
+        // ---------------------------------------------------------------------
+
+        session.save(new Book(generateBookIsbn(), BOOK_COMMON_VALUE_01, generateBookAuthorName(), generateBookPrice(),
                 generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
                 generateBookPublisher(session)));
 
-        session.save(new Book(generateBookIsbn(), generateBookName(), BOOK_COMMON_VALUE, generateBookPrice(),
+        session.save(new Book(generateBookIsbn(), generateBookName(), BOOK_COMMON_VALUE_01, generateBookPrice(),
                 generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
                 generateBookPublisher(session)));
 
         session.save(new Book(generateBookIsbn(), generateBookName(), generateBookAuthorName(), generateBookPrice(),
-                BOOK_COMMON_VALUE, generateBookPublicationDate(), generateBookAwarded(),
+                BOOK_COMMON_VALUE_01, generateBookPublicationDate(), generateBookAwarded(),
                 generateBookPublisher(session)));
+
+        // ---------------------------------------------------------------------
+
+        session.save(new Book(generateBookIsbn(), BOOK_COMMON_VALUE_11, generateBookAuthorName(), generateBookPrice(),
+                generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
+                generateBookPublisher(session)));
+
+        session.save(new Book(generateBookIsbn(), generateBookName(), BOOK_COMMON_VALUE_11, generateBookPrice(),
+                generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
+                generateBookPublisher(session)));
+
+        session.save(new Book(generateBookIsbn(), generateBookName(), generateBookAuthorName(), generateBookPrice(),
+                BOOK_COMMON_VALUE_11, generateBookPublicationDate(), generateBookAwarded(),
+                generateBookPublisher(session)));
+
+        // ---------------------------------------------------------------------
 
         session.save(new Book(generateBookIsbn(), generateBookName(), BOOK_AUTHOR_NAME_01, BOOK_PRICE_11,
                 generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
@@ -310,7 +363,8 @@ public class BookManager {
         session.beginTransaction();
 
         @SuppressWarnings(CommonsUtil.COMPILER_WARNING_NAME_UNCHECKED)
-        List<Book> queryResults = session.createQuery("from Book").list();
+        List<Book> queryResults = session.createQuery(QUERY_STATEMENT_FROM_BOOK).list();
+        System.out.println();
         for (Book queryResult : queryResults) {
             System.out.println(queryResult);
         }
@@ -841,7 +895,7 @@ public class BookManager {
 
             org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword()
                     .onFields(FIELD_NAME_BOOK_NAME, FIELD_NAME_BOOK_AUTHOR_NAME, FIELD_NAME_BOOK_INTRO)
-                    .matching(BOOK_COMMON_VALUE).createQuery();
+                    .matching(BOOK_COMMON_VALUE_01).createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
             CommonsUtil.showQueryString(query);
 
@@ -868,7 +922,7 @@ public class BookManager {
             // additional setting.
             org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().onField(FIELD_NAME_BOOK_NAME)
                     .andField(FIELD_NAME_BOOK_AUTHOR_NAME).boostedTo(5).andField(FIELD_NAME_BOOK_INTRO)
-                    .matching(BOOK_COMMON_VALUE).createQuery();
+                    .matching(BOOK_COMMON_VALUE_01).createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
             CommonsUtil.showQueryString(query);
 
@@ -1020,8 +1074,8 @@ public class BookManager {
     /**
      * <pre>
      * Custom Indexes per Test Values
-     *          Test Document
-     * Index    #1                      #2                      #3
+     * Index    Index Values per Test Document
+     * Name     #1                      #2                      #3
      * -------------------------------------------------------------------------
      * itemA    valueA1 valueA2         valueA1                 ----
      * itemB    valueB1                 valueB2                 valueB3
@@ -1191,6 +1245,111 @@ public class BookManager {
 
             CommonsUtil.printDelimiterLine();
         }
+    }
+
+    @SuppressWarnings(CommonsUtil.COMPILER_WARNING_NAME_UNCHECKED)
+    private void searchWithQueriesOrFieldsBoosted() {
+        FullTextSession fullTextSession = Search.getFullTextSession(HibernateUtil.getSessionFactory().openSession());
+        fullTextSession.beginTransaction();
+
+        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Book.class).get();
+
+        String delimiterLinePrefixBase = new Object() {
+        }.getClass().getEnclosingMethod().getName();
+        int testCounter = 0;
+
+        // =====================================================================
+        // Queries Not Boosted
+        // =====================================================================
+        {
+            CommonsUtil.printDelimiterLine(true, delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR
+                    + (++testCounter) + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + "Queries Not Boosted");
+
+            org.apache.lucene.search.Query luceneSubquery1 = queryBuilder.keyword().onField(FIELD_NAME_BOOK_NAME)
+                    .matching(BOOK_NAME_61).createQuery();
+            org.apache.lucene.search.Query luceneSubquery2 = queryBuilder.keyword().onField(FIELD_NAME_BOOK_PRICE)
+                    .matching(BOOK_PRICE_21).createQuery();
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.bool().should(luceneSubquery1)
+                    .should(luceneSubquery2).createQuery();
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            CommonsUtil.showQueryString(query);
+
+            List<Book> queryResults = query.list();
+            for (Book queryResult : queryResults) {
+                System.out.println(queryResult);
+            }
+
+            CommonsUtil.printDelimiterLine();
+        }
+
+        // TODO It seems the boost to the queries does not work.
+        // =====================================================================
+        // Queries Boosted
+        // =====================================================================
+        {
+            CommonsUtil.printDelimiterLine(true, delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR
+                    + (++testCounter) + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + "Queries Boosted");
+
+            org.apache.lucene.search.Query luceneSubquery1 = queryBuilder.keyword().onField(FIELD_NAME_BOOK_NAME)
+                    .matching(BOOK_NAME_61).createQuery();
+            org.apache.lucene.search.Query luceneSubquery2 = queryBuilder.keyword().boostedTo(5.0F).withConstantScore()
+                    .onField(FIELD_NAME_BOOK_PRICE).matching(BOOK_PRICE_21).createQuery();
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.bool().should(luceneSubquery1)
+                    .should(luceneSubquery2).createQuery();
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            CommonsUtil.showQueryString(query);
+
+            List<Book> queryResults = query.list();
+            for (Book queryResult : queryResults) {
+                System.out.println(queryResult);
+            }
+
+            CommonsUtil.printDelimiterLine();
+        }
+
+        // =====================================================================
+        // Fields Not Boosted
+        // =====================================================================
+        {
+            CommonsUtil.printDelimiterLine(true, delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR
+                    + (++testCounter) + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + "Fields Not Boosted");
+
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().onField(FIELD_NAME_BOOK_NAME)
+                    .andField(FIELD_NAME_BOOK_AUTHOR_NAME).andField(FIELD_NAME_BOOK_INTRO)
+                    .matching(BOOK_COMMON_VALUE_11).createQuery();
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            CommonsUtil.showQueryString(query);
+
+            List<Book> queryResults = query.list();
+            for (Book queryResult : queryResults) {
+                System.out.println(queryResult);
+            }
+
+            CommonsUtil.printDelimiterLine();
+        }
+
+        // =====================================================================
+        // Fields Boosted
+        // =====================================================================
+        {
+            CommonsUtil.printDelimiterLine(true, delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR
+                    + (++testCounter) + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + "Fields Boosted");
+
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().onField(FIELD_NAME_BOOK_NAME)
+                    .andField(FIELD_NAME_BOOK_AUTHOR_NAME).boostedTo(5.0F).andField(FIELD_NAME_BOOK_INTRO)
+                    .matching(BOOK_COMMON_VALUE_11).createQuery();
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            CommonsUtil.showQueryString(query);
+
+            List<Book> queryResults = query.list();
+            for (Book queryResult : queryResults) {
+                System.out.println(queryResult);
+            }
+
+            CommonsUtil.printDelimiterLine();
+        }
+
+        fullTextSession.getTransaction().commit();
     }
 
     private static final String generateBookIsbn() {

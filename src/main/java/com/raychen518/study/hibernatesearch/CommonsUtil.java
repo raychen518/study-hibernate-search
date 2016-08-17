@@ -1,21 +1,25 @@
 package com.raychen518.study.hibernatesearch;
 
-import java.util.Random;
-
 import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
 
 public final class CommonsUtil {
 
-    public static final String DELIMITER_LINE_PREFIX_CONNECTOR = " - ";
-
     public static final String COMPILER_WARNING_NAME_RAW_TYPES = "rawtypes";
     public static final String COMPILER_WARNING_NAME_UNCHECKED = "unchecked";
+    public static final String DELIMITER_LINE_PREFIX_CONNECTOR = " - ";
 
     private static final String DELIMITER_LINE = "################################################################################";
 
     private CommonsUtil() {
+    }
+
+    /**
+     * Print a delimiter line.
+     */
+    public static void printDelimiterLine() {
+        printDelimiterLine(false, null);
     }
 
     /**
@@ -40,13 +44,6 @@ public final class CommonsUtil {
     }
 
     /**
-     * Print a delimiter line.
-     */
-    public static void printDelimiterLine() {
-        printDelimiterLine(false, null);
-    }
-
-    /**
      * Show the query string of a Hibernate Search.
      * 
      * @param query
@@ -68,11 +65,6 @@ public final class CommonsUtil {
         return (string == null) ? null
                 : string.replace(String.valueOf(CharUtils.CR), StringUtils.SPACE).replace(String.valueOf(CharUtils.LF),
                         StringUtils.SPACE);
-    }
-
-    public static Long generateRandomNumber() {
-        Random random = new Random();
-        return Math.abs(random.nextLong());
     }
 
     public static void main(String[] args) {
