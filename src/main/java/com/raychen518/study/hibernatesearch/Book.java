@@ -2,7 +2,6 @@ package com.raychen518.study.hibernatesearch;
 
 import java.util.Date;
 
-import javax.persistence.Entity;
 import javax.persistence.Id;
 
 import org.hibernate.search.annotations.DateBridge;
@@ -14,7 +13,6 @@ import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.annotations.Store;
 
-@Entity
 @Indexed
 public class Book {
 
@@ -35,7 +33,7 @@ public class Book {
 
     /**
      * <pre>
-     * To make a field sortable, the @SortableField annotation should be added to that field.
+     * To make a field sortable, the @SortableField annotation should be used on that field.
      * </pre>
      */
     @Field(store = Store.YES)
@@ -80,7 +78,7 @@ public class Book {
 
     /**
      * <pre>
-     * To make an associations field to be indexed, the @IndexedEmbedded annotation should be added to that field.
+     * To make an associations field to be indexed, the @IndexedEmbedded annotation should be used on that field.
      * </pre>
      */
     @IndexedEmbedded

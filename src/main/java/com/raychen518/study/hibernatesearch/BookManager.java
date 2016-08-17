@@ -109,11 +109,22 @@ public class BookManager {
         manager.searchAsRangeQuery();
 
         // =================================================
+        // Search with Pagination and Sorting
+        // =================================================
+        manager.searchWithPagination();
+        manager.searchWithSorting();
+        manager.searchWithPaginationAndSorting();
+
+        // =================================================
         // Search Using Various Query Features
         // =================================================
         manager.searchOnMultipleFields();
         manager.searchUsingCombinedQueries();
         manager.searchByCustomIndexes();
+
+        // =================================================
+        // Search Using Various Query Options
+        // =================================================
 
         // TODO Add examples about using the following query options.
         // - boostedTo()
@@ -121,13 +132,6 @@ public class BookManager {
         // - filteredBy()
         // - ignoreAnalyzer()
         // - ignoreFieldBridge()
-
-        // =================================================
-        // Search with Pagination and Sorting
-        // =================================================
-        manager.searchWithPagination();
-        manager.searchWithSorting();
-        manager.searchWithPaginationAndSorting();
     }
 
     private void startIndexing() throws InterruptedException {
@@ -685,6 +689,139 @@ public class BookManager {
     }
 
     @SuppressWarnings(CommonsUtil.COMPILER_WARNING_NAME_UNCHECKED)
+    private void searchWithPagination() {
+        FullTextSession fullTextSession = Search.getFullTextSession(HibernateUtil.getSessionFactory().openSession());
+        fullTextSession.beginTransaction();
+
+        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Book.class).get();
+
+        String delimiterLinePrefixBase = new Object() {
+        }.getClass().getEnclosingMethod().getName();
+        int testCounter = 0;
+
+        CommonsUtil.printDelimiterLine(true,
+                delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
+
+        org.apache.lucene.search.Query luceneQuery = queryBuilder.all().createQuery();
+        FullTextQuery query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+        CommonsUtil.showQueryString(query);
+
+        int paginationPageSize = 15;
+        int paginationPageNo = 2;
+        int firstResultIndex = (paginationPageNo - 1) * paginationPageSize;
+        query.setMaxResults(paginationPageSize);
+        query.setFirstResult(firstResultIndex);
+
+        List<Book> queryResults = query.list();
+        for (Book queryResult : queryResults) {
+            System.out.println(queryResult);
+        }
+
+        int resultSize = query.getResultSize();
+
+        System.out.println("paginationPageSize: " + paginationPageSize);
+        System.out.println("paginationPageNo: " + paginationPageNo);
+        System.out.println("firstResultIndex: " + firstResultIndex);
+        System.out.println("resultSize: " + resultSize);
+
+        CommonsUtil.printDelimiterLine();
+
+        fullTextSession.getTransaction().commit();
+    }
+
+    /**
+     * <pre>
+     * - The fields to sort should be annotated using the @SortableField annotation.
+     * - Multiple fields can be used together for sorting in one query.
+     * </pre>
+     */
+    @SuppressWarnings(CommonsUtil.COMPILER_WARNING_NAME_UNCHECKED)
+    private void searchWithSorting() {
+        FullTextSession fullTextSession = Search.getFullTextSession(HibernateUtil.getSessionFactory().openSession());
+        fullTextSession.beginTransaction();
+
+        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Book.class).get();
+
+        String delimiterLinePrefixBase = new Object() {
+        }.getClass().getEnclosingMethod().getName();
+        int testCounter = 0;
+
+        CommonsUtil.printDelimiterLine(true,
+                delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
+
+        org.apache.lucene.search.Query luceneQuery = queryBuilder.range().onField(FIELD_NAME_BOOK_PRICE).above(50.0D)
+                .createQuery();
+        FullTextQuery query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+        CommonsUtil.showQueryString(query);
+
+        String sortFieldName = FIELD_NAME_BOOK_NAME;
+        Type sortFieldType = SortField.Type.STRING;
+        boolean sortOrderDescending = false;
+        query.setSort(new Sort(new SortField(sortFieldName, sortFieldType, sortOrderDescending)));
+
+        List<Book> queryResults = query.list();
+        for (Book queryResult : queryResults) {
+            System.out.println(queryResult);
+        }
+
+        CommonsUtil.printDelimiterLine();
+
+        fullTextSession.getTransaction().commit();
+    }
+
+    @SuppressWarnings(CommonsUtil.COMPILER_WARNING_NAME_UNCHECKED)
+    private void searchWithPaginationAndSorting() {
+        FullTextSession fullTextSession = Search.getFullTextSession(HibernateUtil.getSessionFactory().openSession());
+        fullTextSession.beginTransaction();
+
+        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Book.class).get();
+
+        String delimiterLinePrefixBase = new Object() {
+        }.getClass().getEnclosingMethod().getName();
+        int testCounter = 0;
+
+        CommonsUtil.printDelimiterLine(true,
+                delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
+
+        org.apache.lucene.search.Query luceneQuery = queryBuilder.all().createQuery();
+        FullTextQuery query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+        CommonsUtil.showQueryString(query);
+
+        String sortFieldName1 = FIELD_NAME_BOOK_PRICE;
+        Type sortFieldType1 = SortField.Type.DOUBLE;
+        boolean sortOrderDescending1 = true;
+
+        String sortFieldName2 = FIELD_NAME_BOOK_NAME;
+        Type sortFieldType2 = SortField.Type.STRING;
+        boolean sortOrderDescending2 = false;
+
+        query.setSort(new Sort(new SortField(sortFieldName1, sortFieldType1, sortOrderDescending1),
+                new SortField(sortFieldName2, sortFieldType2, sortOrderDescending2)));
+
+        int paginationPageSize = 15;
+        int paginationPageNo = 1;
+        int firstResultIndex = (paginationPageNo - 1) * paginationPageSize;
+        query.setMaxResults(paginationPageSize);
+        query.setFirstResult(firstResultIndex);
+
+        List<Book> queryResults = query.list();
+        for (Book queryResult : queryResults) {
+            System.out.println(queryResult);
+        }
+
+        int resultSize = query.getResultSize();
+
+        System.out.println("paginationPageSize: " + paginationPageSize);
+        System.out.println("paginationPageNo: " + paginationPageNo);
+        System.out.println("firstResultIndex: " + firstResultIndex);
+        System.out.println("resultSize: " + resultSize);
+
+        CommonsUtil.printDelimiterLine();
+
+        fullTextSession.getTransaction().commit();
+    }
+
+    @SuppressWarnings(CommonsUtil.COMPILER_WARNING_NAME_UNCHECKED)
     private void searchOnMultipleFields() {
         FullTextSession fullTextSession = Search.getFullTextSession(HibernateUtil.getSessionFactory().openSession());
         fullTextSession.beginTransaction();
@@ -1054,139 +1191,6 @@ public class BookManager {
 
             CommonsUtil.printDelimiterLine();
         }
-    }
-
-    @SuppressWarnings(CommonsUtil.COMPILER_WARNING_NAME_UNCHECKED)
-    private void searchWithPagination() {
-        FullTextSession fullTextSession = Search.getFullTextSession(HibernateUtil.getSessionFactory().openSession());
-        fullTextSession.beginTransaction();
-
-        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Book.class).get();
-
-        String delimiterLinePrefixBase = new Object() {
-        }.getClass().getEnclosingMethod().getName();
-        int testCounter = 0;
-
-        CommonsUtil.printDelimiterLine(true,
-                delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
-
-        org.apache.lucene.search.Query luceneQuery = queryBuilder.all().createQuery();
-        FullTextQuery query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
-        CommonsUtil.showQueryString(query);
-
-        int paginationPageSize = 15;
-        int paginationPageNo = 2;
-        int firstResultIndex = (paginationPageNo - 1) * paginationPageSize;
-        query.setMaxResults(paginationPageSize);
-        query.setFirstResult(firstResultIndex);
-
-        List<Book> queryResults = query.list();
-        for (Book queryResult : queryResults) {
-            System.out.println(queryResult);
-        }
-
-        int resultSize = query.getResultSize();
-
-        System.out.println("paginationPageSize: " + paginationPageSize);
-        System.out.println("paginationPageNo: " + paginationPageNo);
-        System.out.println("firstResultIndex: " + firstResultIndex);
-        System.out.println("resultSize: " + resultSize);
-
-        CommonsUtil.printDelimiterLine();
-
-        fullTextSession.getTransaction().commit();
-    }
-
-    /**
-     * <pre>
-     * - The fields to sort should be annotated using the @SortableField annotation.
-     * - Multiple fields can be used together for sorting in one query.
-     * </pre>
-     */
-    @SuppressWarnings(CommonsUtil.COMPILER_WARNING_NAME_UNCHECKED)
-    private void searchWithSorting() {
-        FullTextSession fullTextSession = Search.getFullTextSession(HibernateUtil.getSessionFactory().openSession());
-        fullTextSession.beginTransaction();
-
-        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Book.class).get();
-
-        String delimiterLinePrefixBase = new Object() {
-        }.getClass().getEnclosingMethod().getName();
-        int testCounter = 0;
-
-        CommonsUtil.printDelimiterLine(true,
-                delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
-
-        org.apache.lucene.search.Query luceneQuery = queryBuilder.range().onField(FIELD_NAME_BOOK_PRICE).above(50.0D)
-                .createQuery();
-        FullTextQuery query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
-        CommonsUtil.showQueryString(query);
-
-        String sortFieldName = FIELD_NAME_BOOK_NAME;
-        Type sortFieldType = SortField.Type.STRING;
-        boolean sortOrderDescending = false;
-        query.setSort(new Sort(new SortField(sortFieldName, sortFieldType, sortOrderDescending)));
-
-        List<Book> queryResults = query.list();
-        for (Book queryResult : queryResults) {
-            System.out.println(queryResult);
-        }
-
-        CommonsUtil.printDelimiterLine();
-
-        fullTextSession.getTransaction().commit();
-    }
-
-    @SuppressWarnings(CommonsUtil.COMPILER_WARNING_NAME_UNCHECKED)
-    private void searchWithPaginationAndSorting() {
-        FullTextSession fullTextSession = Search.getFullTextSession(HibernateUtil.getSessionFactory().openSession());
-        fullTextSession.beginTransaction();
-
-        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Book.class).get();
-
-        String delimiterLinePrefixBase = new Object() {
-        }.getClass().getEnclosingMethod().getName();
-        int testCounter = 0;
-
-        CommonsUtil.printDelimiterLine(true,
-                delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
-
-        org.apache.lucene.search.Query luceneQuery = queryBuilder.all().createQuery();
-        FullTextQuery query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
-        CommonsUtil.showQueryString(query);
-
-        String sortFieldName1 = FIELD_NAME_BOOK_PRICE;
-        Type sortFieldType1 = SortField.Type.DOUBLE;
-        boolean sortOrderDescending1 = true;
-
-        String sortFieldName2 = FIELD_NAME_BOOK_NAME;
-        Type sortFieldType2 = SortField.Type.STRING;
-        boolean sortOrderDescending2 = false;
-
-        query.setSort(new Sort(new SortField(sortFieldName1, sortFieldType1, sortOrderDescending1),
-                new SortField(sortFieldName2, sortFieldType2, sortOrderDescending2)));
-
-        int paginationPageSize = 15;
-        int paginationPageNo = 1;
-        int firstResultIndex = (paginationPageNo - 1) * paginationPageSize;
-        query.setMaxResults(paginationPageSize);
-        query.setFirstResult(firstResultIndex);
-
-        List<Book> queryResults = query.list();
-        for (Book queryResult : queryResults) {
-            System.out.println(queryResult);
-        }
-
-        int resultSize = query.getResultSize();
-
-        System.out.println("paginationPageSize: " + paginationPageSize);
-        System.out.println("paginationPageNo: " + paginationPageNo);
-        System.out.println("firstResultIndex: " + firstResultIndex);
-        System.out.println("resultSize: " + resultSize);
-
-        CommonsUtil.printDelimiterLine();
-
-        fullTextSession.getTransaction().commit();
     }
 
     private static final String generateBookIsbn() {

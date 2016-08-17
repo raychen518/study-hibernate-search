@@ -46,7 +46,6 @@ package com.raychen518.study.hibernatesearch;
  * 03. Mark the entities to be indexed by Hibernate Search, using the @Indexed annotation.
  *     Book.java
  *     -------------------------------------------------------------------------
- *-    @Entity
  *-    @Indexed
  *     public class Book {
  *     -------------------------------------------------------------------------
@@ -64,7 +63,7 @@ package com.raychen518.study.hibernatesearch;
  *-    @Field
  *     private String isbn;
  * 
- *-    @Field(index = Index.YES, analyze = Analyze.YES, store = Store.YES)
+ *-    @Field(index = Index.YES, analyze = Analyze.YES, store = Store.NO)
  *     private String name;
  *     -------------------------------------------------------------------------
  * 
