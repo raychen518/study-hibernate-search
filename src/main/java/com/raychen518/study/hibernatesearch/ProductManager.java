@@ -3,6 +3,7 @@ package com.raychen518.study.hibernatesearch;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang3.RandomUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.search.FullTextSession;
@@ -46,26 +47,17 @@ public class ProductManager {
 
         Date createdDate = new Date();
 
-        session.save(new ProductA(CommonsUtil.generateRandomNumber(), "feature001", "featureA1001", "featureA2001",
-                createdDate));
-        session.save(new ProductA(CommonsUtil.generateRandomNumber(), "feature002", "featureA1002", "featureA2002",
-                createdDate));
-        session.save(new ProductA(CommonsUtil.generateRandomNumber(), "feature003", "featureA1003", "featureA2003",
-                createdDate));
+        session.save(new ProductA(generateProductSerialNumber(), "feature001", "featureA1001", "featureA2001", createdDate));
+        session.save(new ProductA(generateProductSerialNumber(), "feature002", "featureA1002", "featureA2002", createdDate));
+        session.save(new ProductA(generateProductSerialNumber(), "feature003", "featureA1003", "featureA2003", createdDate));
 
-        session.save(new ProductB(CommonsUtil.generateRandomNumber(), "feature001", "featureB1001", "featureB2001",
-                createdDate));
-        session.save(new ProductB(CommonsUtil.generateRandomNumber(), "feature002", "featureB1002", "featureB2002",
-                createdDate));
-        session.save(new ProductB(CommonsUtil.generateRandomNumber(), "feature003", "featureB1003", "featureB2003",
-                createdDate));
+        session.save(new ProductB(generateProductSerialNumber(), "feature001", "featureB1001", "featureB2001", createdDate));
+        session.save(new ProductB(generateProductSerialNumber(), "feature002", "featureB1002", "featureB2002", createdDate));
+        session.save(new ProductB(generateProductSerialNumber(), "feature003", "featureB1003", "featureB2003", createdDate));
 
-        session.save(new ProductC(CommonsUtil.generateRandomNumber(), "feature001", "featureC1001", "featureC2001",
-                createdDate));
-        session.save(new ProductC(CommonsUtil.generateRandomNumber(), "feature002", "featureC1002", "featureC2002",
-                createdDate));
-        session.save(new ProductC(CommonsUtil.generateRandomNumber(), "feature003", "featureC1003", "featureC2003",
-                createdDate));
+        session.save(new ProductC(generateProductSerialNumber(), "feature001", "featureC1001", "featureC2001", createdDate));
+        session.save(new ProductC(generateProductSerialNumber(), "feature002", "featureC1002", "featureC2002", createdDate));
+        session.save(new ProductC(generateProductSerialNumber(), "feature003", "featureC1003", "featureC2003", createdDate));
 
         session.getTransaction().commit();
         session.close();
@@ -89,11 +81,16 @@ public class ProductManager {
         FullTextSession fullTextSession = Search.getFullTextSession(HibernateUtil.getSessionFactory().openSession());
         fullTextSession.beginTransaction();
 
-        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(ProductB.class).get();
-        org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().onFields("feature").matching("feature002").createQuery();
+        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(ProductB.class)
+                .get();
+        org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().onFields("feature").matching("feature002")
+                .createQuery();
 
-        // If the 2nd parameter of the following method invocation is "ProductB.class", then the results of the type ProductB return.
-        // If the 2nd parameter of the following method invocation is "Product.class", then the results of the types ProductA, ProductB and ProductC return.
+        // If the 2nd parameter of the following method invocation is
+        // "ProductB.class", then the results of the type ProductB return.
+        // If the 2nd parameter of the following method invocation is
+        // "Product.class", then the results of the types ProductA, ProductB and
+        // ProductC return.
         Query query = fullTextSession.createFullTextQuery(luceneQuery, ProductB.class);
 
         @SuppressWarnings("unchecked")
@@ -103,6 +100,10 @@ public class ProductManager {
         }
 
         fullTextSession.getTransaction().commit();
+    }
+
+    private static final Long generateProductSerialNumber() {
+        return RandomUtils.nextLong(0, Long.MAX_VALUE) + 1;
     }
 
 }
