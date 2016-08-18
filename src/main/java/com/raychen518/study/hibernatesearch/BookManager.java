@@ -115,6 +115,7 @@ public class BookManager {
     private static final String MESSAGE_TEXT_USING_THE_NOT_METHOD_FOR_A_NOT_QUERY = "Using the not() Method for a NOT Query";
     private static final String MESSAGE_TEXT_USING_THE_ALL_METHOD_FOR_AN_ALL_QUERY = "Using the all() Method for an ALL Query";
     private static final String MESSAGE_TEXT_USING_THE_EXCEPT_METHOD_TO_EXCLUDE_RESULTS = "Using the except(...) Method to Exclude Results";
+    private static final String MESSAGE_TEXT_SEARCHING_ALL_BOOKS_AWARDED = "Searching All Books Awarded";
     private static final String MESSAGE_TEXT_QUERIES_NOT_BOOSTED = "Queries Not Boosted";
     private static final String MESSAGE_TEXT_QUERIES_BOOSTED = "Queries Boosted";
     private static final String MESSAGE_TEXT_FIELDS_NOT_BOOSTED = "Fields Not Boosted";
@@ -1285,13 +1286,13 @@ public class BookManager {
 
     /**
      * <pre>
-     * Because values of the field "awarded" have been changed in the indexing per the following rule,
-     *     Original Value (Boolean)     Final Value (String)
+     * Because values of the field "awarded" have been changed in the field's bridge implementation per the following rule,
+     *     Before Change (Boolean)      After Change (String)
      *     ---------------------------------------------------------------------
      *     true                         "1"
      *     false                        "0"
      *     <All Other Cases>            "0"
-     * the values "0" and "1" (instead of "false" and "true") should be used in the search.
+     * the values "0" and "1" instead of "false" and "true" should be used in the search.
      * </pre>
      */
     @SuppressWarnings(CommonsUtil.COMPILER_WARNING_NAME_UNCHECKED)
@@ -1306,8 +1307,9 @@ public class BookManager {
         int testCounter = 0;
 
         {
-            CommonsUtil.printDelimiterLine(true, delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR
-                    + (++testCounter) + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + "Searching All Books Awarded");
+            CommonsUtil.printDelimiterLine(true,
+                    delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter)
+                            + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + MESSAGE_TEXT_SEARCHING_ALL_BOOKS_AWARDED);
 
             org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(FIELD_NAME_BOOK_AWARDED)
                     .sentence(String.valueOf(NumberUtils.INTEGER_ONE)).createQuery();

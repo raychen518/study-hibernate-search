@@ -8,7 +8,7 @@ import org.hibernate.search.bridge.StringBridge;
  * This field bridge implementation changes the field values per the following rule.
  * 
  * Before Change (Boolean)      After Change (String)
- * ---------------------------------------------------------------------
+ * ---------------------------------------------------------
  * true                         "1"
  * false                        "0"
  * <All Other Cases>            "0"
