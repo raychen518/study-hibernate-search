@@ -5,18 +5,20 @@ package com.raychen518.study.hibernatesearch;
  * +++++++++++++++++
  * Contents
  * +++++++++++++++++
- * Versions
+ * Libraries
  * Overview
  * Steps to Use
+ * Analyzers
  * References
  * 
  * =================
- * Versions
+ * Libraries
  * =================
+ * Here is the list of all used libraries and their versions.
  * Library              Version
  * -------------------------------------
  * Hibernate Search     5.5.4.Final
- * Java SE              1.8 (jdk1.8.0_66)
+ * Java SE              1.8.0_66
  * 
  * =================
  * Overview
@@ -26,6 +28,7 @@ package com.raychen518.study.hibernatesearch;
  * =================
  * Steps to Use
  * =================
+ * Here are the normal steps to use Hibernate Search.
  * 01. Introduce the Hibernate Search dependency in the POM file.
  *     pom.xml
  *     -------------------------------------------------------------------------
@@ -130,6 +133,70 @@ package com.raychen518.study.hibernatesearch;
  *         fullTextSession.getTransaction().commit();
  *     }
  *     -------------------------------------------------------------------------
+ * 
+ * =================
+ * Analyzers
+ * =================
+ * An analyzer is an object that controls the process to convert text into single terms (words),
+ * and it applies both the indexing process and the search process.
+ * 
+ * To use an analyzer, perform any of the following actions.
+ * - Setting the "hibernate.search.analyzer" property in the configuration file.
+ * - Setting the @Analyzer annotation at the class level.
+ * - Setting the @Analyzer annotation at the field level.
+ * 
+ * When using an analyzer, specify
+ * - either the fully qualified class name of an analyzer
+ * - or an analyzer definition defined by the @AnalyzerDef annotation.
+ * 
+ * To define an analyzer, use the @AnalyzerDef or @AnalyzerDefs annotation on
+ * - any @Indexed class (regardless of where the analyzer is used),
+ * - any parent class of an @Indexed class,
+ * - or any "package-info.java" class of a package containing an @Indexed class.
+ * Note: Analyzer definitions are global and their names must be unique.
+ * 
+ * Generally, using analyzers starts with a tokenizer followed by some filters.
+ * 
+ * Example
+ * ---------------------------------------------------------------------------------------------------------------------
+ *-@Entity
+ *-@Indexed
+ *-@AnalyzerDef(name = "customAnalyzer",
+ *     tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+ *     filters = {
+ *-        @TokenFilterDef(factory = LowerCaseFilterFactory.class),
+ *-        @TokenFilterDef(factory = SnowballPorterFilterFactory.class, params = {
+ *-            @Parameter(name = "language", value = "English")
+ *         })
+ *     }
+ * )
+ * public class Book {
+ *     ...
+ * 
+ *-    @Field
+ *-    @Analyzer(definition = "customAnalyzer")
+ *     private String title;
+ * 
+ *-    @Field
+ *-    @Analyzer(definition = "customAnalyzer")
+ *     private String subtitle;
+ * 
+ *     ...
+ * }
+ * ---------------------------------------------------------------------------------------------------------------------
+ * 
+ * Example Description
+ * ---------------------------------------------------------------------------------------------------------------------
+ * - An analyzer named "customAnalyzer" is defined on the class "Book".
+ * - The analyzer named "customAnalyzer" is used on the fields "title" and "subtitle".
+ * - The analyzer named "customAnalyzer" is using the class "StandardTokenizerFactory" as its tokenizer.
+ *   Note: The "StandardTokenizerFactory" tokenizer splits words at punctuation characters and hyphens, and it is a good general purpose tokenizer.
+ *         But for email addresses or Internet host names, it is not the best fit because it will split them up.
+ *         In that case, either use Lucene's ClassicTokenizerFactory or implement a custom tokenizer.
+ * - The analyzer is using the classes "LowerCaseFilterFactory" and "SnowballPorterFilterFactory" (with a parameter "language:English") as its filters.
+ *   Note: The "LowerCaseFilterFactory" filter makes the letters in each token lower case,
+ *         while the "SnowballPorterFilterFactory" filter applies language specific stemming.
+ * ---------------------------------------------------------------------------------------------------------------------
  * 
  * =================
  * References
