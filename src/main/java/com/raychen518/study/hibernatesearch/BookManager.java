@@ -37,6 +37,9 @@ public class BookManager {
     private static final String FIELD_NAME_BOOK_PRICE = "price";
     private static final String FIELD_NAME_BOOK_INTRO = "intro";
     private static final String FIELD_NAME_BOOK_AWARDED = "awarded";
+    private static final String FIELD_NAME_A = "itemA";
+    private static final String FIELD_NAME_B = "itemB";
+    private static final String FIELD_NAME_C = "itemC";
 
     // =================================
     // Test Values
@@ -73,26 +76,15 @@ public class BookManager {
     private static final String BOOK_INTRO_03 = "XXXXX\r\nXXX key=\"itemB\" value=\"valueB3\" XXX\r\nXXXXX\r\nXXX key=\"itemC\" value=\"valueC1\" XXX\r\nXXXXX\r\nXXX key=\"itemC\" value=\"valueC3\" XXX\r\nXXXXX\r\n";
     private static final String BOOK_COMMON_VALUE_01 = RandomStringUtils.randomAlphabetic(5);
     private static final String BOOK_COMMON_VALUE_11 = RandomStringUtils.randomAlphabetic(5);
-
-    // =================================
-    // Index Names
-    // =================================
-    private static final String INDEX_NAME_A = "itemA";
-    private static final String INDEX_NAME_B = "itemB";
-    private static final String INDEX_NAME_C = "itemC";
-
-    // =================================
-    // Index Values
-    // =================================
-    private static final String INDEX_VALUE_A1 = "valueA1";
-    private static final String INDEX_VALUE_A2 = "valueA2";
-    private static final String INDEX_VALUE_A3 = "valueA3";
-    private static final String INDEX_VALUE_B1 = "valueB1";
-    private static final String INDEX_VALUE_B2 = "valueB2";
-    private static final String INDEX_VALUE_B3 = "valueB3";
-    private static final String INDEX_VALUE_C1 = "valueC1";
-    private static final String INDEX_VALUE_C2 = "valueC2";
-    private static final String INDEX_VALUE_C3 = "valueC3";
+    private static final String VALUE_A1 = "valueA1";
+    private static final String VALUE_A2 = "valueA2";
+    private static final String VALUE_A3 = "valueA3";
+    private static final String VALUE_B1 = "valueB1";
+    private static final String VALUE_B2 = "valueB2";
+    private static final String VALUE_B3 = "valueB3";
+    private static final String VALUE_C1 = "valueC1";
+    private static final String VALUE_C2 = "valueC2";
+    private static final String VALUE_C3 = "valueC3";
 
     // =================================
     // Message Texts
@@ -1108,13 +1100,19 @@ public class BookManager {
 
     /**
      * <pre>
-     * Custom Indexes per Test Values
-     * Index    Index Values per Test Document
-     * Name     #1                      #2                      #3
+     * 
+     * If the values of the field "intro" contain statements in following format,
+     *     <code>key="KEY" value="VALUE"</code>
+     * additional fields will be added into the documents.
+     * 
+     * For entities which intro is BOOK_INTRO_01, BOOK_INTRO_02 or BOOK_INTRO_03,
+     * their documents after indexing will have additional fields as follows.
+     *          Value
+     * Name     Document #1         Document #2         Document#3
      * -------------------------------------------------------------------------
-     * itemA    valueA1 valueA2         valueA1                 ----
-     * itemB    valueB1                 valueB2                 valueB3
-     * itemC    ----                    valueC1                 valueC1 valueC3
+     * itemA    valueA1 valueA2     valueA1             ----
+     * itemB    valueB1             valueB2             valueB3
+     * itemC    ----                valueC1             valueC1 valueC3
      * </pre>
      */
     @SuppressWarnings(CommonsUtil.COMPILER_WARNING_NAME_UNCHECKED)
@@ -1132,8 +1130,8 @@ public class BookManager {
             CommonsUtil.printDelimiterLine(true,
                     delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
 
-            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(INDEX_NAME_A)
-                    .sentence(INDEX_VALUE_A1).createQuery();
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(FIELD_NAME_A).sentence(VALUE_A1)
+                    .createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
             CommonsUtil.showQueryString(query);
 
@@ -1149,8 +1147,8 @@ public class BookManager {
             CommonsUtil.printDelimiterLine(true,
                     delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
 
-            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(INDEX_NAME_A)
-                    .sentence(INDEX_VALUE_A2).createQuery();
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(FIELD_NAME_A).sentence(VALUE_A2)
+                    .createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
             CommonsUtil.showQueryString(query);
 
@@ -1166,8 +1164,8 @@ public class BookManager {
             CommonsUtil.printDelimiterLine(true,
                     delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
 
-            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(INDEX_NAME_A)
-                    .sentence(INDEX_VALUE_A3).createQuery();
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(FIELD_NAME_A)
+                    .sentence(VALUE_A3).createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
             CommonsUtil.showQueryString(query);
 
@@ -1183,8 +1181,8 @@ public class BookManager {
             CommonsUtil.printDelimiterLine(true,
                     delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
 
-            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(INDEX_NAME_B)
-                    .sentence(INDEX_VALUE_B1).createQuery();
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(FIELD_NAME_B)
+                    .sentence(VALUE_B1).createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
             CommonsUtil.showQueryString(query);
 
@@ -1200,8 +1198,8 @@ public class BookManager {
             CommonsUtil.printDelimiterLine(true,
                     delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
 
-            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(INDEX_NAME_B)
-                    .sentence(INDEX_VALUE_B2).createQuery();
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(FIELD_NAME_B)
+                    .sentence(VALUE_B2).createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
             CommonsUtil.showQueryString(query);
 
@@ -1217,8 +1215,8 @@ public class BookManager {
             CommonsUtil.printDelimiterLine(true,
                     delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
 
-            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(INDEX_NAME_B)
-                    .sentence(INDEX_VALUE_B3).createQuery();
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(FIELD_NAME_B)
+                    .sentence(VALUE_B3).createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
             CommonsUtil.showQueryString(query);
 
@@ -1234,8 +1232,8 @@ public class BookManager {
             CommonsUtil.printDelimiterLine(true,
                     delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
 
-            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(INDEX_NAME_C)
-                    .sentence(INDEX_VALUE_C1).createQuery();
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(FIELD_NAME_C)
+                    .sentence(VALUE_C1).createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
             CommonsUtil.showQueryString(query);
 
@@ -1251,8 +1249,8 @@ public class BookManager {
             CommonsUtil.printDelimiterLine(true,
                     delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
 
-            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(INDEX_NAME_C)
-                    .sentence(INDEX_VALUE_C2).createQuery();
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(FIELD_NAME_C)
+                    .sentence(VALUE_C2).createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
             CommonsUtil.showQueryString(query);
 
@@ -1268,8 +1266,8 @@ public class BookManager {
             CommonsUtil.printDelimiterLine(true,
                     delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
 
-            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(INDEX_NAME_C)
-                    .sentence(INDEX_VALUE_C3).createQuery();
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(FIELD_NAME_C)
+                    .sentence(VALUE_C3).createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
             CommonsUtil.showQueryString(query);
 

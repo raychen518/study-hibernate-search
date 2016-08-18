@@ -22,8 +22,8 @@ public class BookIntroBridge implements FieldBridge, StringBridge {
     /**
      * <pre>
      * For every found statement <code>key="KEY" value="VALUE"</code> in the field's value,
-     * an index should be created in the document with its name corresponding to KEY, and its value being VALUE.
-     * If that index has already been created, VALUE should be appended to that index's value with a space prefix.
+     * a field (index) should be added into the document with its name being KEY, and its value being VALUE.
+     * If that field to add is already there, VALUE should be appended to that field's value with a space prefixed.
      * 
      * For example, if the field contains the following statements,
      *     key="itemA" value="valueA1"
@@ -31,10 +31,12 @@ public class BookIntroBridge implements FieldBridge, StringBridge {
      *     key="itemB" value="valueB1"
      *     key="itemB" value="valueB3"
      *     key="itemC" value="valueC2"
-     * then the field has 3 indexes in the document, as follows.
-     *     1. Name: itemA, Value: valueA1 valueA2
-     *     2. Name: itemB, Value: valueB1 valueB3
-     *     3. Name: itemC, Value: valueC2
+     * then in the indexing, besides the field itself, another 3 fields will be added into the document, as follows.
+     *     Name     Value
+     *     -----------------------------
+     *     itemA    valueA1 valueA2
+     *     itemB    valueB1 valueB3
+     *     itemC    valueC2
      * 
      * The statement pattern is as follows.
      *     key="(\S+?)" value="(\S+?)"
@@ -44,9 +46,7 @@ public class BookIntroBridge implements FieldBridge, StringBridge {
     public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
         if (value != null) {
             String bookIntro = (String) value;
-
-            Pattern statementPattern = Pattern.compile(PATTERN_STATEMENT);
-            Matcher statementMatcher = statementPattern.matcher(bookIntro);
+            Matcher statementMatcher = Pattern.compile(PATTERN_STATEMENT).matcher(bookIntro);
             Map<String, Set<String>> statements = new HashMap<>();
 
             while (statementMatcher.find()) {
