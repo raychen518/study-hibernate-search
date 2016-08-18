@@ -58,15 +58,21 @@ public class Book {
 
     /**
      * <pre>
-     * A built-in field bridge implementation - DateBridge is used here to define the Date field's resolution to second instead of the default millisecond.
+     * - By default, the name of the field (document index) is set using the name of the annotated entity field,
+     *   but it can be changed by setting the "name" attribute of the @Field annotation.
      * 
-     * In other words, the millisecond part of the Date field is ignored in the indexing here.
+     *   Here, this field's name will be set as "publicationTime" instead of the default "publicationDate".
      * 
-     * Assuming the number of milliseconds of the Date field is 1259752333267 (2009-12-02 19:12:13.267),
-     * then the Date field's value in the indexes will be 1259752333000 (the millisecond part (267) is ignored).
+     * - A built-in field bridge implementation - DateBridge is used here
+     *   to define this Date field's resolution to second (Resolution.SECOND) instead of the default millisecond (Resolution.MILLISECOND).
+     * 
+     *   In other words, here, the millisecond part of this Date field is ignored in the indexing.
+     * 
+     *   To be more specific, assuming the number of milliseconds of this Date field is 1259752333267 (2009-12-02 19:12:13.267) here,
+     *   then this Date field's value in the indexes will be 1259752333000 (the millisecond part (267) is ignored).
      * </pre>
      */
-    @Field
+    @Field(name = "publicationTime")
     @DateBridge(resolution = Resolution.SECOND)
     private Date publicationDate;
 

@@ -10,6 +10,7 @@ import java.util.Random;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.SortField.Type;
@@ -35,6 +36,7 @@ public class BookManager {
     private static final String FIELD_NAME_BOOK_AUTHOR_NAME = "authorName";
     private static final String FIELD_NAME_BOOK_PRICE = "price";
     private static final String FIELD_NAME_BOOK_INTRO = "intro";
+    private static final String FIELD_NAME_BOOK_AWARDED = "awarded";
 
     // =================================
     // Test Values
@@ -148,7 +150,8 @@ public class BookManager {
         // =================================================
         manager.searchOnMultipleFields();
         manager.searchUsingCombinedQueries();
-        manager.searchByCustomIndexes();
+        manager.searchOnChangedFields1();
+        manager.searchOnChangedFields2();
 
         // =================================================
         // Search Using Query Options
@@ -1114,7 +1117,7 @@ public class BookManager {
      * </pre>
      */
     @SuppressWarnings(CommonsUtil.COMPILER_WARNING_NAME_UNCHECKED)
-    private void searchByCustomIndexes() {
+    private void searchOnChangedFields1() {
         FullTextSession fullTextSession = Search.getFullTextSession(HibernateUtil.getSessionFactory().openSession());
         fullTextSession.beginTransaction();
 
@@ -1276,6 +1279,50 @@ public class BookManager {
 
             CommonsUtil.printDelimiterLine();
         }
+
+        fullTextSession.getTransaction().commit();
+    }
+
+    /**
+     * <pre>
+     * Because values of the field "awarded" have been changed in the indexing per the following rule,
+     *     Original Value (Boolean)     Final Value (String)
+     *     ---------------------------------------------------------------------
+     *     true                         "1"
+     *     false                        "0"
+     *     <All Other Cases>            "0"
+     * the values "0" and "1" (instead of "false" and "true") should be used in the search.
+     * </pre>
+     */
+    @SuppressWarnings(CommonsUtil.COMPILER_WARNING_NAME_UNCHECKED)
+    private void searchOnChangedFields2() {
+        FullTextSession fullTextSession = Search.getFullTextSession(HibernateUtil.getSessionFactory().openSession());
+        fullTextSession.beginTransaction();
+
+        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Book.class).get();
+
+        String delimiterLinePrefixBase = new Object() {
+        }.getClass().getEnclosingMethod().getName();
+        int testCounter = 0;
+
+        {
+            CommonsUtil.printDelimiterLine(true, delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR
+                    + (++testCounter) + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + "Searching All Books Awarded");
+
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(FIELD_NAME_BOOK_AWARDED)
+                    .sentence(String.valueOf(NumberUtils.INTEGER_ONE)).createQuery();
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            CommonsUtil.showQueryString(query);
+
+            List<Book> queryResults = query.list();
+            for (Book queryResult : queryResults) {
+                System.out.println(queryResult);
+            }
+
+            CommonsUtil.printDelimiterLine();
+        }
+
+        fullTextSession.getTransaction().commit();
     }
 
     @SuppressWarnings(CommonsUtil.COMPILER_WARNING_NAME_UNCHECKED)
@@ -1407,11 +1454,28 @@ public class BookManager {
 
     private static final Date generateBookPublicationDate() {
         Calendar calendar = Calendar.getInstance();
+
+        // 1985-01-01 00:00:00:000
         calendar.set(Calendar.YEAR, 1985);
-        Long minBookPublicationDateValue = calendar.getTimeInMillis();
+        calendar.set(Calendar.MONTH, Calendar.JANUARY);
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        Long minTimeValue = calendar.getTimeInMillis();
+
+        // 2015-12-31 23:59:59:999
         calendar.set(Calendar.YEAR, 2015);
-        Long maxBookPublicationDateValue = calendar.getTimeInMillis();
-        return new Date(RandomUtils.nextLong(minBookPublicationDateValue, maxBookPublicationDateValue));
+        calendar.set(Calendar.MONTH, Calendar.DECEMBER);
+        calendar.set(Calendar.DAY_OF_MONTH, 31);
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        calendar.set(Calendar.MILLISECOND, 999);
+        Long maxTimeValue = calendar.getTimeInMillis();
+
+        return new Date(RandomUtils.nextLong(minTimeValue, maxTimeValue));
     }
 
     private static final boolean generateBookAwarded() {
