@@ -21,6 +21,9 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 
+/**
+ * This class serves as the manager of manipulating the Book entities.
+ */
 public class BookManager {
 
     // =================================
@@ -113,14 +116,22 @@ public class BookManager {
     private static final String MESSAGE_TEXT_FIELDS_NOT_BOOSTED = "Fields Not Boosted";
     private static final String MESSAGE_TEXT_FIELDS_BOOSTED = "Fields Boosted";
 
+    /**
+     * Serves as the launcher of current class (application).
+     * 
+     * @param args
+     *            The launch arguments.
+     * @throws InterruptedException
+     *             The InterruptedException exception.
+     */
     public static void main(String[] args) throws InterruptedException {
         BookManager manager = new BookManager();
 
         manager.startIndexing();
 
-        manager.deleteAll();
-        manager.saveSome();
-        manager.listAll();
+        manager.deleteAllBooks();
+        manager.saveSomeBooks();
+        manager.listAllBooks();
 
         // =================================================
         // Search as Different Queries
@@ -164,7 +175,10 @@ public class BookManager {
         fullTextSession.createIndexer(Book.class).startAndWait();
     }
 
-    public void deleteAll() {
+    /**
+     * Delete all books.
+     */
+    public void deleteAllBooks() {
         Session session = HibernateUtil.getSessionFactory().openSession();
         session.beginTransaction();
 
@@ -179,7 +193,10 @@ public class BookManager {
         session.close();
     }
 
-    public void saveSome() {
+    /**
+     * Save some books.
+     */
+    public void saveSomeBooks() {
         Session session = HibernateUtil.getSessionFactory().openSession();
         session.beginTransaction();
 
@@ -374,7 +391,10 @@ public class BookManager {
         session.close();
     }
 
-    public void listAll() {
+    /**
+     * List all books.
+     */
+    public void listAllBooks() {
         Session session = HibernateUtil.getSessionFactory().openSession();
         session.beginTransaction();
 
@@ -1164,8 +1184,8 @@ public class BookManager {
             CommonsUtil.printDelimiterLine(true,
                     delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
 
-            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(FIELD_NAME_A)
-                    .sentence(VALUE_A3).createQuery();
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(FIELD_NAME_A).sentence(VALUE_A3)
+                    .createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
             CommonsUtil.showQueryString(query);
 
@@ -1181,8 +1201,8 @@ public class BookManager {
             CommonsUtil.printDelimiterLine(true,
                     delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
 
-            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(FIELD_NAME_B)
-                    .sentence(VALUE_B1).createQuery();
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(FIELD_NAME_B).sentence(VALUE_B1)
+                    .createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
             CommonsUtil.showQueryString(query);
 
@@ -1198,8 +1218,8 @@ public class BookManager {
             CommonsUtil.printDelimiterLine(true,
                     delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
 
-            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(FIELD_NAME_B)
-                    .sentence(VALUE_B2).createQuery();
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(FIELD_NAME_B).sentence(VALUE_B2)
+                    .createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
             CommonsUtil.showQueryString(query);
 
@@ -1215,8 +1235,8 @@ public class BookManager {
             CommonsUtil.printDelimiterLine(true,
                     delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
 
-            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(FIELD_NAME_B)
-                    .sentence(VALUE_B3).createQuery();
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(FIELD_NAME_B).sentence(VALUE_B3)
+                    .createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
             CommonsUtil.showQueryString(query);
 
@@ -1232,8 +1252,8 @@ public class BookManager {
             CommonsUtil.printDelimiterLine(true,
                     delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
 
-            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(FIELD_NAME_C)
-                    .sentence(VALUE_C1).createQuery();
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(FIELD_NAME_C).sentence(VALUE_C1)
+                    .createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
             CommonsUtil.showQueryString(query);
 
@@ -1249,8 +1269,8 @@ public class BookManager {
             CommonsUtil.printDelimiterLine(true,
                     delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
 
-            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(FIELD_NAME_C)
-                    .sentence(VALUE_C2).createQuery();
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(FIELD_NAME_C).sentence(VALUE_C2)
+                    .createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
             CommonsUtil.showQueryString(query);
 
@@ -1266,8 +1286,8 @@ public class BookManager {
             CommonsUtil.printDelimiterLine(true,
                     delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
 
-            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(FIELD_NAME_C)
-                    .sentence(VALUE_C3).createQuery();
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(FIELD_NAME_C).sentence(VALUE_C3)
+                    .createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
             CommonsUtil.showQueryString(query);
 
