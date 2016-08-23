@@ -125,42 +125,42 @@ public class BookManager {
      *             The InterruptedException exception.
      */
     public static void main(String[] args) throws InterruptedException {
-        BookManager manager = new BookManager();
+        BookManager bookManager = new BookManager();
 
-        manager.startIndexing();
+        bookManager.startIndexingBooks();
 
-        manager.deleteAllBooks();
-        manager.saveSomeBooks();
-        manager.listAllBooks();
+        bookManager.deleteAllBooks();
+        bookManager.saveSomeBooks();
+        bookManager.listAllBooks();
 
         // =================================================
         // Search as Different Queries
         // =================================================
-        manager.searchAsKeywordQuery();
-        manager.searchAsFuzzyQuery();
-        manager.searchAsWildcardQuery();
-        manager.searchAsPhraseQuery();
-        manager.searchAsRangeQuery();
+        bookManager.searchAsKeywordQuery();
+        bookManager.searchAsFuzzyQuery();
+        bookManager.searchAsWildcardQuery();
+        bookManager.searchAsPhraseQuery();
+        bookManager.searchAsRangeQuery();
 
         // =================================================
         // Search with Pagination and Sorting
         // =================================================
-        manager.searchWithPagination();
-        manager.searchWithSorting();
-        manager.searchWithPaginationAndSorting();
+        bookManager.searchWithPagination();
+        bookManager.searchWithSorting();
+        bookManager.searchWithPaginationAndSorting();
 
         // =================================================
         // Search Using Query Features
         // =================================================
-        manager.searchOnMultipleFields();
-        manager.searchUsingCombinedQueries();
-        manager.searchOnChangedFields1();
-        manager.searchOnChangedFields2();
+        bookManager.searchOnMultipleFields();
+        bookManager.searchUsingCombinedQueries();
+        bookManager.searchOnChangedFields1();
+        bookManager.searchOnChangedFields2();
 
         // =================================================
         // Search Using Query Options
         // =================================================
-        manager.searchWithQueriesOrFieldsBoosted();
+        bookManager.searchWithQueriesOrFieldsBoosted();
 
         // TODO Add examples about using the following query options.
 
@@ -170,7 +170,7 @@ public class BookManager {
         // - ignoreFieldBridge()
     }
 
-    private void startIndexing() throws InterruptedException {
+    private void startIndexingBooks() throws InterruptedException {
         FullTextSession fullTextSession = Search.getFullTextSession(HibernateUtil.getSessionFactory().openSession());
         fullTextSession.createIndexer(Book.class).startAndWait();
     }
