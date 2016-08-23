@@ -4,16 +4,32 @@ import java.util.Date;
 
 import javax.persistence.Id;
 
+import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
+import org.apache.lucene.analysis.snowball.SnowballPorterFilterFactory;
+import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
+import org.hibernate.search.annotations.Analyzer;
+import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.annotations.Store;
+import org.hibernate.search.annotations.TokenFilterDef;
+import org.hibernate.search.annotations.TokenizerDef;
 
+/**
+ * This class represents a book entity. It and its related classes demonstrate
+ * most basic usages of Hibernate Search.
+ */
 @Indexed
+@AnalyzerDef(name = "remarksAnalyzer", tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class) , filters = {
+        @TokenFilterDef(factory = LowerCaseFilterFactory.class),
+        @TokenFilterDef(factory = SnowballPorterFilterFactory.class, params = {
+                @Parameter(name = "language", value = "English") }) })
 public class Book {
 
     @Id
@@ -80,6 +96,8 @@ public class Book {
     @FieldBridge(impl = BookAwardedBridge.class)
     private boolean awarded;
 
+    @Field(store = Store.YES)
+    @Analyzer(definition = "remarksAnalyzer")
     private String remarks;
 
     /**
@@ -90,9 +108,34 @@ public class Book {
     @IndexedEmbedded
     private Publisher publisher;
 
+    /**
+     * Construct a book.
+     */
     public Book() {
+        // This empty default constructor should be kept for internal use from
+        // Hibernate Search.
     }
 
+    /**
+     * Construct a book by the specified information.
+     * 
+     * @param isbn
+     *            The book's ISBN.
+     * @param name
+     *            The book's name.
+     * @param authorName
+     *            The book's author's name.
+     * @param price
+     *            The book's price.
+     * @param intro
+     *            The book's intro.
+     * @param publicationDate
+     *            The book's publication date.
+     * @param awarded
+     *            Whether the book has been awarded.
+     * @param publisher
+     *            The book's publisher.
+     */
     public Book(String isbn, String name, String authorName, double price, String intro, Date publicationDate,
             boolean awarded, Publisher publisher) {
         this.isbn = isbn;
@@ -109,7 +152,7 @@ public class Book {
     public String toString() {
         return "Book [id=" + id + ", isbn=" + isbn + ", name=" + name + ", authorName=" + authorName + ", price="
                 + price + ", intro=" + CommonsUtil.replaceCrLf(intro) + ", publicationDate=" + publicationDate
-                + ", awarded=" + awarded + ", publisher=" + publisher + "]";
+                + ", awarded=" + awarded + ", remarks=" + remarks + ", publisher=" + publisher + "]";
     }
 
     public Long getId() {

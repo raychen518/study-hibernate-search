@@ -13,6 +13,7 @@
         <property name="intro" column="INTRO" />
         <property name="publicationDate" column="PUBLICATION_DATE" />
         <property name="awarded" column="AWARDED" />
+        <property name="remarks" column="REMARKS" />
         <many-to-one name="publisher" column="PUBLISHER_ID" class="com.raychen518.study.hibernatesearch.Publisher" />
     </class>
 </hibernate-mapping>

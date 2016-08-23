@@ -40,6 +40,8 @@ public class BookManager {
     private static final String FIELD_NAME_BOOK_PRICE = "price";
     private static final String FIELD_NAME_BOOK_INTRO = "intro";
     private static final String FIELD_NAME_BOOK_AWARDED = "awarded";
+    private static final String FIELD_NAME_BOOK_REMARKS = "remarks";
+
     private static final String FIELD_NAME_A = "itemA";
     private static final String FIELD_NAME_B = "itemB";
     private static final String FIELD_NAME_C = "itemC";
@@ -68,6 +70,7 @@ public class BookManager {
     private static final String BOOK_NAME_54 = "Abc aaa Def bbb ccc Ghi";
     private static final String BOOK_NAME_61 = generateBookName();
     private static final String BOOK_AUTHOR_NAME_01 = generateBookAuthorName();
+    private static final String BOOK_AUTHOR_NAME_02 = generateBookAuthorName();
     private static final double BOOK_PRICE_01 = 80.0;
     private static final double BOOK_PRICE_02 = 85.0;
     private static final double BOOK_PRICE_03 = 90.0;
@@ -77,8 +80,14 @@ public class BookManager {
     private static final String BOOK_INTRO_01 = "XXXXX\r\nXXX key=\"itemA\" value=\"valueA1\" XXX\r\nXXXXX\r\nXXX key=\"itemA\" value=\"valueA2\" XXX\r\nXXXXX\r\nXXX key=\"itemB\" value=\"valueB1\" XXX\r\nXXXXX\r\n";
     private static final String BOOK_INTRO_02 = "XXXXX\r\nXXX key=\"itemA\" value=\"valueA1\" XXX\r\nXXXXX\r\nXXX key=\"itemB\" value=\"valueB2\" XXX\r\nXXXXX\r\nXXX key=\"itemC\" value=\"valueC1\" XXX\r\nXXXXX\r\n";
     private static final String BOOK_INTRO_03 = "XXXXX\r\nXXX key=\"itemB\" value=\"valueB3\" XXX\r\nXXXXX\r\nXXX key=\"itemC\" value=\"valueC1\" XXX\r\nXXXXX\r\nXXX key=\"itemC\" value=\"valueC3\" XXX\r\nXXXXX\r\n";
+    private static final String BOOK_REMARKS_01 = "a01~b02`c03!d04@e05#f06$g07%h08^i09&j10*k11(l12)m13_n14-o15+p16=q17{r18[s19}t20]u21|v22\\w23:x24;y25\"z26'A27<B28,C29>D30.E31?F32/G33";
+    private static final String BOOK_REMARKS_02 = "xxx do xxx";
+    private static final String BOOK_REMARKS_03 = "xxx does xxx";
+    private static final String BOOK_REMARKS_04 = "xxx did xxx";
+    private static final String BOOK_REMARKS_05 = "xxx doing xxx";
     private static final String BOOK_COMMON_VALUE_01 = RandomStringUtils.randomAlphabetic(5);
     private static final String BOOK_COMMON_VALUE_11 = RandomStringUtils.randomAlphabetic(5);
+
     private static final String VALUE_A1 = "valueA1";
     private static final String VALUE_A2 = "valueA2";
     private static final String VALUE_A3 = "valueA3";
@@ -111,6 +120,10 @@ public class BookManager {
     private static final String MESSAGE_TEXT_USING_THE_ALL_METHOD_FOR_AN_ALL_QUERY = "Using the all() Method for an ALL Query";
     private static final String MESSAGE_TEXT_USING_THE_EXCEPT_METHOD_TO_EXCLUDE_RESULTS = "Using the except(...) Method to Exclude Results";
     private static final String MESSAGE_TEXT_SEARCHING_ALL_BOOKS_AWARDED = "Searching All Books Awarded";
+    private static final String MESSAGE_TEXT_NO_TESTING = "No Testing";
+    private static final String MESSAGE_TEXT_TESTING_THE_STANDARD_TOKENIZER = "Testing the Standard Tokenizer";
+    private static final String MESSAGE_TEXT_TESTING_THE_LOWER_CASE_FILTER = "Testing the Lower Case Filter";
+    private static final String MESSAGE_TEXT_TESTING_THE_SNOWBALL_PORTER_FILTER = "Testing the Snowball Porter Filter";
     private static final String MESSAGE_TEXT_QUERIES_NOT_BOOSTED = "Queries Not Boosted";
     private static final String MESSAGE_TEXT_QUERIES_BOOSTED = "Queries Boosted";
     private static final String MESSAGE_TEXT_FIELDS_NOT_BOOSTED = "Fields Not Boosted";
@@ -161,6 +174,11 @@ public class BookManager {
         bookManager.searchUsingCombinedQueries();
         bookManager.searchOnChangedFields1();
         bookManager.searchOnChangedFields2();
+
+        // =================================================
+        // Search Using Analyzers
+        // =================================================
+        bookManager.searchUsingAnalyzers();
 
         // =================================================
         // Search Using Query Options
@@ -356,6 +374,17 @@ public class BookManager {
 
         session.save(new Book(generateBookIsbn(), generateBookName(), generateBookAuthorName(), generateBookPrice(),
                 BOOK_INTRO_03, generateBookPublicationDate(), generateBookAwarded(), generateBookPublisher(session)));
+
+        // ---------------------------------------------------------------------
+
+        String[] bookRemarks = { BOOK_REMARKS_01, BOOK_REMARKS_02, BOOK_REMARKS_03, BOOK_REMARKS_04, BOOK_REMARKS_05 };
+        for (int i = 0; i < bookRemarks.length; i++) {
+            Book book = new Book(generateBookIsbn(), generateBookName(), BOOK_AUTHOR_NAME_02, generateBookPrice(),
+                    generateBookIntro(), generateBookPublicationDate(), generateBookAwarded(),
+                    generateBookPublisher(session));
+            book.setRemarks(bookRemarks[i]);
+            session.save(book);
+        }
 
         // ---------------------------------------------------------------------
 
@@ -1350,6 +1379,117 @@ public class BookManager {
     }
 
     @SuppressWarnings(CommonsUtil.COMPILER_WARNING_NAME_UNCHECKED)
+    private void searchUsingAnalyzers() {
+        FullTextSession fullTextSession = Search.getFullTextSession(HibernateUtil.getSessionFactory().openSession());
+        fullTextSession.beginTransaction();
+
+        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Book.class).get();
+
+        String delimiterLinePrefixBase = new Object() {
+        }.getClass().getEnclosingMethod().getName();
+        int testCounter = 0;
+
+        // =====================================================================
+        // No Testing
+        // =====================================================================
+        {
+            CommonsUtil.printDelimiterLine(true, delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR
+                    + (++testCounter) + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + MESSAGE_TEXT_NO_TESTING);
+
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().onField(FIELD_NAME_BOOK_AUTHOR_NAME)
+                    .matching(BOOK_AUTHOR_NAME_02).createQuery();
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            CommonsUtil.showQueryString(query);
+
+            List<Book> queryResults = query.list();
+            for (Book queryResult : queryResults) {
+                System.out.println(queryResult);
+            }
+
+            CommonsUtil.printDelimiterLine();
+        }
+
+        // =====================================================================
+        // Testing the Standard Tokenizer
+        // =====================================================================
+        {
+            CommonsUtil.printDelimiterLine(true,
+                    delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter)
+                            + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR
+                            + MESSAGE_TEXT_TESTING_THE_STANDARD_TOKENIZER);
+
+            org.apache.lucene.search.Query luceneSubquery1 = queryBuilder.keyword().onField(FIELD_NAME_BOOK_AUTHOR_NAME)
+                    .matching(BOOK_AUTHOR_NAME_02).createQuery();
+            org.apache.lucene.search.Query luceneSubquery2 = queryBuilder.keyword().onField(FIELD_NAME_BOOK_REMARKS)
+                    .matching("~b02`").createQuery();
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.bool().must(luceneSubquery1).must(luceneSubquery2)
+                    .createQuery();
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            CommonsUtil.showQueryString(query);
+
+            List<Book> queryResults = query.list();
+            for (Book queryResult : queryResults) {
+                System.out.println(queryResult);
+            }
+
+            CommonsUtil.printDelimiterLine();
+        }
+
+        // =====================================================================
+        // Testing the Lower Case Filter
+        // =====================================================================
+        {
+            CommonsUtil.printDelimiterLine(true,
+                    delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter)
+                            + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + MESSAGE_TEXT_TESTING_THE_LOWER_CASE_FILTER);
+
+            org.apache.lucene.search.Query luceneSubquery1 = queryBuilder.keyword().onField(FIELD_NAME_BOOK_AUTHOR_NAME)
+                    .matching(BOOK_AUTHOR_NAME_02).createQuery();
+            org.apache.lucene.search.Query luceneSubquery2 = queryBuilder.keyword().onField(FIELD_NAME_BOOK_REMARKS)
+                    .matching("A27").createQuery();
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.bool().must(luceneSubquery1).must(luceneSubquery2)
+                    .createQuery();
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            CommonsUtil.showQueryString(query);
+
+            List<Book> queryResults = query.list();
+            for (Book queryResult : queryResults) {
+                System.out.println(queryResult);
+            }
+
+            CommonsUtil.printDelimiterLine();
+        }
+
+        // =====================================================================
+        // Testing the Snowball Porter Filter
+        // =====================================================================
+        {
+            CommonsUtil.printDelimiterLine(true,
+                    delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter)
+                            + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR
+                            + MESSAGE_TEXT_TESTING_THE_SNOWBALL_PORTER_FILTER);
+
+            org.apache.lucene.search.Query luceneSubquery1 = queryBuilder.keyword().onField(FIELD_NAME_BOOK_AUTHOR_NAME)
+                    .matching(BOOK_AUTHOR_NAME_02).createQuery();
+            org.apache.lucene.search.Query luceneSubquery2 = queryBuilder.keyword().onField(FIELD_NAME_BOOK_REMARKS)
+                    .matching("do").createQuery();
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.bool().must(luceneSubquery1).must(luceneSubquery2)
+                    .createQuery();
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            CommonsUtil.showQueryString(query);
+
+            List<Book> queryResults = query.list();
+            for (Book queryResult : queryResults) {
+                System.out.println(queryResult);
+            }
+
+            CommonsUtil.printDelimiterLine();
+        }
+
+        fullTextSession.getTransaction().commit();
+    }
+
+    @SuppressWarnings(CommonsUtil.COMPILER_WARNING_NAME_UNCHECKED)
     private void searchWithBoostedFactors() {
         FullTextSession fullTextSession = Search.getFullTextSession(HibernateUtil.getSessionFactory().openSession());
         fullTextSession.beginTransaction();
@@ -1526,7 +1666,7 @@ public class BookManager {
     }
 
     private static final String generateBookAuthorName() {
-        return RandomStringUtils.randomAlphanumeric(7);
+        return RandomStringUtils.randomAlphanumeric(12);
     }
 
     private static final double generateBookPrice() {

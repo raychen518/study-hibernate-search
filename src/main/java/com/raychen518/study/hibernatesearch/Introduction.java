@@ -121,7 +121,7 @@ package com.raychen518.study.hibernatesearch;
  * 
  *         QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Book.class).get();
  * 
- *         org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().onFields("content").matching("def").createQuery();
+ *         org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().onFields("intro").matching("computer").createQuery();
  *         Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
  * 
  *-        @SuppressWarnings("unchecked")
@@ -155,11 +155,10 @@ package com.raychen518.study.hibernatesearch;
  * - or any "package-info.java" class of a package containing an @Indexed class.
  * Note: Analyzer definitions are global and their names must be unique.
  * 
- * Generally, using analyzers starts with a tokenizer followed by some filters.
+ * Generally, using an analyzer starts with a tokenizer followed by some filters.
  * 
  * Example
  * ---------------------------------------------------------------------------------------------------------------------
- *-@Entity
  *-@Indexed
  *-@AnalyzerDef(name = "customAnalyzer",
  *     tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
