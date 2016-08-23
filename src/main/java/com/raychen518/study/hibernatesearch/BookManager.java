@@ -116,6 +116,11 @@ public class BookManager {
     private static final String MESSAGE_TEXT_FIELDS_NOT_BOOSTED = "Fields Not Boosted";
     private static final String MESSAGE_TEXT_FIELDS_BOOSTED = "Fields Boosted";
 
+    // =================================
+    // Misc
+    // =================================
+    private static final Random random = new Random();
+
     /**
      * Serves as the launcher of current class (application).
      * 
@@ -160,11 +165,10 @@ public class BookManager {
         // =================================================
         // Search Using Query Options
         // =================================================
-        bookManager.searchWithQueriesOrFieldsBoosted();
+        bookManager.searchWithBoostedFactors();
+        bookManager.searchWithConstantScores();
 
         // TODO Add examples about using the following query options.
-
-        // - withConstantScore()
         // - filteredBy()
         // - ignoreAnalyzer()
         // - ignoreFieldBridge()
@@ -1125,7 +1129,7 @@ public class BookManager {
      *     <code>key="KEY" value="VALUE"</code>
      * additional fields will be added into the documents.
      * 
-     * For entities which intro is BOOK_INTRO_01, BOOK_INTRO_02 or BOOK_INTRO_03,
+     * For entities which intro is BOOK_INTRO_01, BOOK_INTRO_02 or BOOK_INTRO_03 defined above,
      * their documents after indexing will have additional fields as follows.
      *          Value
      * Name     Document #1         Document #2         Document#3
@@ -1346,7 +1350,7 @@ public class BookManager {
     }
 
     @SuppressWarnings(CommonsUtil.COMPILER_WARNING_NAME_UNCHECKED)
-    private void searchWithQueriesOrFieldsBoosted() {
+    private void searchWithBoostedFactors() {
         FullTextSession fullTextSession = Search.getFullTextSession(HibernateUtil.getSessionFactory().openSession());
         fullTextSession.beginTransaction();
 
@@ -1390,7 +1394,7 @@ public class BookManager {
 
             org.apache.lucene.search.Query luceneSubquery1 = queryBuilder.keyword().onField(FIELD_NAME_BOOK_NAME)
                     .matching(BOOK_NAME_61).createQuery();
-            org.apache.lucene.search.Query luceneSubquery2 = queryBuilder.keyword().boostedTo(5.0F).withConstantScore()
+            org.apache.lucene.search.Query luceneSubquery2 = queryBuilder.keyword().boostedTo(5.0F)
                     .onField(FIELD_NAME_BOOK_PRICE).matching(BOOK_PRICE_21).createQuery();
             org.apache.lucene.search.Query luceneQuery = queryBuilder.bool().should(luceneSubquery1)
                     .should(luceneSubquery2).createQuery();
@@ -1436,6 +1440,69 @@ public class BookManager {
             org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().onField(FIELD_NAME_BOOK_NAME)
                     .andField(FIELD_NAME_BOOK_AUTHOR_NAME).boostedTo(5.0F).andField(FIELD_NAME_BOOK_INTRO)
                     .matching(BOOK_COMMON_VALUE_11).createQuery();
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            CommonsUtil.showQueryString(query);
+
+            List<Book> queryResults = query.list();
+            for (Book queryResult : queryResults) {
+                System.out.println(queryResult);
+            }
+
+            CommonsUtil.printDelimiterLine();
+        }
+
+        fullTextSession.getTransaction().commit();
+    }
+
+    @SuppressWarnings(CommonsUtil.COMPILER_WARNING_NAME_UNCHECKED)
+    private void searchWithConstantScores() {
+        FullTextSession fullTextSession = Search.getFullTextSession(HibernateUtil.getSessionFactory().openSession());
+        fullTextSession.beginTransaction();
+
+        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Book.class).get();
+
+        String delimiterLinePrefixBase = new Object() {
+        }.getClass().getEnclosingMethod().getName();
+        int testCounter = 0;
+
+        // =====================================================================
+        // Constant Score Not Set
+        // =====================================================================
+        {
+            CommonsUtil.printDelimiterLine(true, delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR
+                    + (++testCounter) + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + MESSAGE_TEXT_QUERIES_NOT_BOOSTED);
+
+            org.apache.lucene.search.Query luceneSubquery1 = queryBuilder.keyword().onField(FIELD_NAME_BOOK_NAME)
+                    .matching(BOOK_NAME_61).createQuery();
+            org.apache.lucene.search.Query luceneSubquery2 = queryBuilder.keyword().onField(FIELD_NAME_BOOK_PRICE)
+                    .matching(BOOK_PRICE_21).createQuery();
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.bool().should(luceneSubquery1)
+                    .should(luceneSubquery2).createQuery();
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            CommonsUtil.showQueryString(query);
+
+            List<Book> queryResults = query.list();
+            for (Book queryResult : queryResults) {
+                System.out.println(queryResult);
+            }
+
+            CommonsUtil.printDelimiterLine();
+        }
+
+        // TODO Unsure whether the following result is correct or not.
+        // =====================================================================
+        // Constant Score Set
+        // =====================================================================
+        {
+            CommonsUtil.printDelimiterLine(true, delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR
+                    + (++testCounter) + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + MESSAGE_TEXT_QUERIES_BOOSTED);
+
+            org.apache.lucene.search.Query luceneSubquery1 = queryBuilder.keyword().onField(FIELD_NAME_BOOK_NAME)
+                    .matching(BOOK_NAME_61).createQuery();
+            org.apache.lucene.search.Query luceneSubquery2 = queryBuilder.keyword().boostedTo(5.0F).withConstantScore()
+                    .onField(FIELD_NAME_BOOK_PRICE).matching(BOOK_PRICE_21).createQuery();
+            org.apache.lucene.search.Query luceneQuery = queryBuilder.bool().should(luceneSubquery1)
+                    .should(luceneSubquery2).createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
             CommonsUtil.showQueryString(query);
 
@@ -1499,7 +1566,7 @@ public class BookManager {
     }
 
     private static final boolean generateBookAwarded() {
-        return new Random().nextBoolean();
+        return random.nextBoolean();
     }
 
     private static final Publisher generateBookPublisher(Session session) {
