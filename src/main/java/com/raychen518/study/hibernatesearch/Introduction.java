@@ -192,6 +192,9 @@ package com.raychen518.study.hibernatesearch;
  *   Note: The "StandardTokenizerFactory" tokenizer splits words at punctuation characters and hyphens, and it is a good general purpose tokenizer.
  *         But for email addresses or Internet host names, it is not the best fit because it will split them up.
  *         In that case, either use Lucene's ClassicTokenizerFactory or implement a custom tokenizer.
+ *   Note: Here are some or all punctuation characters mentioned above.
+ *         They count 32 and do not include the underscore (_).
+ *         ~`!@#$%^&*()-+={[}]|\:;"'<,>.?/
  * - The analyzer is using the classes "LowerCaseFilterFactory" and "SnowballPorterFilterFactory" (with a parameter "language:English") as its filters.
  *   Note: The "LowerCaseFilterFactory" filter makes the letters in each token lower case,
  *         while the "SnowballPorterFilterFactory" filter applies language specific stemming.
@@ -213,5 +216,5 @@ package com.raychen518.study.hibernatesearch;
  * https://lucene.apache.org/
  * </pre>
  */
-public class Introduction {
+public interface Introduction {
 }
