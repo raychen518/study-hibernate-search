@@ -9,6 +9,10 @@ package com.raychen518.study.hibernatesearch;
  * Overview
  * Steps to Use
  * Analyzers
+ *     Overview
+ *     Use
+ *     Definition
+ *     Example
  * References
  * 
  * =================
@@ -28,7 +32,8 @@ package com.raychen518.study.hibernatesearch;
  * =================
  * Steps to Use
  * =================
- * Here are the normal steps to use Hibernate Search.
+ * Here are the normal steps to use Hibernate Search with corresponding code examples.
+ * Note: These steps do not cover all approaches to use Hibernate Search.
  * 01. Introduce the Hibernate Search dependency in the POM file.
  *     pom.xml
  *     -------------------------------------------------------------------------
@@ -97,7 +102,22 @@ package com.raychen518.study.hibernatesearch;
  *     private double price;
  *     -------------------------------------------------------------------------
  * 
- * 09. Add the process to start the Hibernate Search indexing when the application starts.
+ * 09. (if necessary) Define and use analyzers, using the @AnalyzerDef / @AnalyzerDefs annotation and the @Analyzer annotation respectively.
+ *     Book.java
+ *     -------------------------------------------------------------------------
+ *-    @Indexed
+ *-    @AnalyzerDef(name = "remarksAnalyzer", tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class) , filters = {
+ *-            @TokenFilterDef(factory = LowerCaseFilterFactory.class),
+ *-            @TokenFilterDef(factory = SnowballPorterFilterFactory.class, params = {
+ *-                    @Parameter(name = "language", value = "English") }) })
+ *     public class Book {
+ * 
+ *-    @Field
+ *-    @Analyzer(definition = "remarksAnalyzer")
+ *     private String remarks;
+ *     -------------------------------------------------------------------------
+ * 
+ * 10. Add the process to start the Hibernate Search indexing when the application starts.
  *     BookManager.java
  *     -------------------------------------------------------------------------
  *     public static void main(String[] args) throws InterruptedException {
@@ -112,7 +132,7 @@ package com.raychen518.study.hibernatesearch;
  *     }
  *     -------------------------------------------------------------------------
  * 
- * 10. Use the Hibernate Search or Apache Lucene API to perform the full-text search.
+ * 11. Use the Hibernate Search or Apache Lucene API to perform the full-text search.
  *     BookManager.java
  *     -------------------------------------------------------------------------
  *     private void search() {
@@ -137,9 +157,22 @@ package com.raychen518.study.hibernatesearch;
  * =================
  * Analyzers
  * =================
+ * =====================================
+ * Overview
+ * =====================================
  * An analyzer is an object that controls the process to convert text into single terms (words),
  * and it applies both the indexing process and the search process.
  * 
+ * The default analyzer to be used is StandardAnalyzer (org.apache.lucene.analysis.standard.StandardAnalyzer),
+ * that uses the following tokenizer and filters.
+ * - StandardTokenizer (org.apache.lucene.analysis.standard.StandardTokenizer)
+ * - StandardFilter (org.apache.lucene.analysis.standard.StandardFilter)
+ * - LowerCaseFilter (org.apache.lucene.analysis.core.LowerCaseFilter)
+ * - StopFilter (org.apache.lucene.analysis.core.StopFilter)
+ * 
+ * =====================================
+ * Use
+ * =====================================
  * To use an analyzer, perform any of the following actions.
  * - Setting the "hibernate.search.analyzer" property in the configuration file.
  * - Setting the @Analyzer annotation at the class level.
@@ -149,15 +182,21 @@ package com.raychen518.study.hibernatesearch;
  * - either the fully qualified class name of an analyzer
  * - or an analyzer definition defined by the @AnalyzerDef annotation.
  * 
+ * =====================================
+ * Definition
+ * =====================================
  * To define an analyzer, use the @AnalyzerDef or @AnalyzerDefs annotation on
  * - any @Indexed class (regardless of where the analyzer is used),
  * - any parent class of an @Indexed class,
  * - or any "package-info.java" class of a package containing an @Indexed class.
  * Note: Analyzer definitions are global and their names must be unique.
  * 
- * Generally, using an analyzer starts with a tokenizer followed by some filters.
+ * Generally, defining an analyzer starts with a tokenizer followed by some filters.
  * 
+ * =====================================
  * Example
+ * =====================================
+ * Code
  * ---------------------------------------------------------------------------------------------------------------------
  *-@Indexed
  *-@AnalyzerDef(name = "customAnalyzer",
@@ -184,7 +223,7 @@ package com.raychen518.study.hibernatesearch;
  * }
  * ---------------------------------------------------------------------------------------------------------------------
  * 
- * Example Description
+ * Description
  * ---------------------------------------------------------------------------------------------------------------------
  * - An analyzer named "customAnalyzer" is defined on the class "Book".
  * - The analyzer named "customAnalyzer" is used on the fields "title" and "subtitle".

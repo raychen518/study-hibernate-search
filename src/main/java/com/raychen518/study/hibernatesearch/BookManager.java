@@ -1479,9 +1479,11 @@ public class BookManager {
             org.apache.lucene.search.Query luceneSubquery1 = queryBuilder.keyword().onField(FIELD_NAME_BOOK_AUTHOR_NAME)
                     .matching(BOOK_AUTHOR_NAME_02).createQuery();
             org.apache.lucene.search.Query luceneSubquery2 = queryBuilder.keyword().onField(FIELD_NAME_BOOK_REMARKS)
-                    .matching("A27").createQuery();
+                    .matching("B02").createQuery();
+            org.apache.lucene.search.Query luceneSubquery3 = queryBuilder.keyword().onField(FIELD_NAME_BOOK_REMARKS)
+                    .matching("a27").createQuery();
             org.apache.lucene.search.Query luceneQuery = queryBuilder.bool().must(luceneSubquery1).must(luceneSubquery2)
-                    .createQuery();
+                    .must(luceneSubquery3).createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
             CommonsUtil.showQueryString(query);
 

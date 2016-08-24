@@ -3,6 +3,9 @@ package com.raychen518.study.hibernatesearch;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Store;
 
+/**
+ * This class represents a publisher entity.
+ */
 public class Publisher {
 
     private Long id;
@@ -12,9 +15,22 @@ public class Publisher {
 
     private String address;
 
+    /**
+     * Construct a publisher.
+     */
     public Publisher() {
+        // This empty default constructor should be kept for internal use from
+        // Hibernate Search.
     }
 
+    /**
+     * Construct a publisher by the specified information.
+     * 
+     * @param name
+     *            The name of the publisher.
+     * @param address
+     *            The address of the publisher.
+     */
     public Publisher(String name, String address) {
         this.name = name;
         this.address = address;

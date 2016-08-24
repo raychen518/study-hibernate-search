@@ -22,7 +22,7 @@ import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
 
 /**
- * This class represents a book entity. It and its related classes demonstrate
+ * This class represents a book entity. It and classes used by it demonstrate
  * most basic usages of Hibernate Search.
  */
 @Indexed
