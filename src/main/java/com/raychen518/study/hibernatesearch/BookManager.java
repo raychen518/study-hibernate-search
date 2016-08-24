@@ -22,14 +22,15 @@ import org.hibernate.search.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 
 /**
- * This class serves as the manager of manipulating the Book entities.
+ * This class serves as the manager of manipulating the Book entities. Running
+ * this class demonstrates most basic usages of Hibernate Search.
  */
 public class BookManager {
 
     // =================================
     // Query Statements
     // =================================
-    private static final String QUERY_STATEMENT_FROM_BOOK = "from Book";
+    private static final String QUERY_STATEMENT_FROM_ENTITY = "from Book";
 
     // =================================
     // Field Names
@@ -41,13 +42,12 @@ public class BookManager {
     private static final String FIELD_NAME_BOOK_INTRO = "intro";
     private static final String FIELD_NAME_BOOK_AWARDED = "awarded";
     private static final String FIELD_NAME_BOOK_REMARKS = "remarks";
-
     private static final String FIELD_NAME_A = "itemA";
     private static final String FIELD_NAME_B = "itemB";
     private static final String FIELD_NAME_C = "itemC";
 
     // =================================
-    // Test Values
+    // Field Values
     // =================================
     private static final String BOOK_ISBN_01 = "1231121234561";
     private static final String BOOK_ISBN_02 = "1234567890123";
@@ -91,7 +91,6 @@ public class BookManager {
     private static final String BOOK_REMARKS_09 = "xxx refactoring xxx";
     private static final String BOOK_COMMON_VALUE_01 = RandomStringUtils.randomAlphabetic(5);
     private static final String BOOK_COMMON_VALUE_11 = RandomStringUtils.randomAlphabetic(5);
-
     private static final String VALUE_A1 = "valueA1";
     private static final String VALUE_A2 = "valueA2";
     private static final String VALUE_A3 = "valueA3";
@@ -138,10 +137,11 @@ public class BookManager {
     // =================================
     // Misc
     // =================================
+    private static final Class<?> ENTITY_TYPE = Book.class;
     private static final Random random = new Random();
 
     /**
-     * Serves as the launcher of current class (application).
+     * Serves as the launcher of current class.
      * 
      * @param args
      *            The launch arguments.
@@ -149,48 +149,48 @@ public class BookManager {
      *             The InterruptedException exception.
      */
     public static void main(String[] args) throws InterruptedException {
-        BookManager bookManager = new BookManager();
+        BookManager manager = new BookManager();
 
-        bookManager.startIndexingBooks();
+        manager.startIndexing();
 
-        bookManager.deleteAllBooks();
-        bookManager.saveSomeBooks();
-        bookManager.listAllBooks();
+        manager.deleteAllItems();
+        manager.saveSomeItems();
+        manager.listAllItems();
 
         // =================================================
         // Search as Different Queries
         // =================================================
-        bookManager.searchAsKeywordQuery();
-        bookManager.searchAsFuzzyQuery();
-        bookManager.searchAsWildcardQuery();
-        bookManager.searchAsPhraseQuery();
-        bookManager.searchAsRangeQuery();
+        manager.searchAsKeywordQuery();
+        manager.searchAsFuzzyQuery();
+        manager.searchAsWildcardQuery();
+        manager.searchAsPhraseQuery();
+        manager.searchAsRangeQuery();
 
         // =================================================
         // Search with Pagination and Sorting
         // =================================================
-        bookManager.searchWithPagination();
-        bookManager.searchWithSorting();
-        bookManager.searchWithPaginationAndSorting();
+        manager.searchWithPagination();
+        manager.searchWithSorting();
+        manager.searchWithPaginationAndSorting();
 
         // =================================================
         // Search Using Query Features
         // =================================================
-        bookManager.searchOnMultipleFields();
-        bookManager.searchUsingCombinedQueries();
-        bookManager.searchOnChangedFields1();
-        bookManager.searchOnChangedFields2();
+        manager.searchOnMultipleFields();
+        manager.searchUsingCombinedQueries();
+        manager.searchOnChangedFields1();
+        manager.searchOnChangedFields2();
 
         // =================================================
         // Search Using Analyzers
         // =================================================
-        bookManager.searchUsingAnalyzers();
+        manager.searchUsingAnalyzers();
 
         // =================================================
         // Search Using Query Options
         // =================================================
-        bookManager.searchWithBoostedFactors();
-        bookManager.searchWithConstantScores();
+        manager.searchWithBoostedFactors();
+        manager.searchWithConstantScores();
 
         // TODO Add examples about using the following query options.
         // - filteredBy()
@@ -198,20 +198,20 @@ public class BookManager {
         // - ignoreFieldBridge()
     }
 
-    private void startIndexingBooks() throws InterruptedException {
+    private void startIndexing() throws InterruptedException {
         FullTextSession fullTextSession = Search.getFullTextSession(HibernateUtil.getSessionFactory().openSession());
-        fullTextSession.createIndexer(Book.class).startAndWait();
+        fullTextSession.createIndexer(ENTITY_TYPE).startAndWait();
     }
 
     /**
-     * Delete all books.
+     * Delete all entity items.
      */
-    public void deleteAllBooks() {
+    public void deleteAllItems() {
         Session session = HibernateUtil.getSessionFactory().openSession();
         session.beginTransaction();
 
         @SuppressWarnings(CommonsUtil.COMPILER_WARNING_NAME_UNCHECKED)
-        List<Book> results = session.createQuery(QUERY_STATEMENT_FROM_BOOK).list();
+        List<Book> results = session.createQuery(QUERY_STATEMENT_FROM_ENTITY).list();
 
         for (Book result : results) {
             session.delete(result);
@@ -222,9 +222,9 @@ public class BookManager {
     }
 
     /**
-     * Save some books.
+     * Save some entity items.
      */
-    public void saveSomeBooks() {
+    public void saveSomeItems() {
         Session session = HibernateUtil.getSessionFactory().openSession();
         session.beginTransaction();
 
@@ -432,14 +432,14 @@ public class BookManager {
     }
 
     /**
-     * List all books.
+     * List all entity items.
      */
-    public void listAllBooks() {
+    public void listAllItems() {
         Session session = HibernateUtil.getSessionFactory().openSession();
         session.beginTransaction();
 
         @SuppressWarnings(CommonsUtil.COMPILER_WARNING_NAME_UNCHECKED)
-        List<Book> queryResults = session.createQuery(QUERY_STATEMENT_FROM_BOOK).list();
+        List<Book> queryResults = session.createQuery(QUERY_STATEMENT_FROM_ENTITY).list();
         System.out.println();
         for (Book queryResult : queryResults) {
             System.out.println(queryResult);
@@ -454,7 +454,7 @@ public class BookManager {
         FullTextSession fullTextSession = Search.getFullTextSession(HibernateUtil.getSessionFactory().openSession());
         fullTextSession.beginTransaction();
 
-        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Book.class).get();
+        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(ENTITY_TYPE).get();
 
         String delimiterLinePrefixBase = new Object() {
         }.getClass().getEnclosingMethod().getName();
@@ -470,7 +470,7 @@ public class BookManager {
 
             org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().onField(FIELD_NAME_BOOK_ISBN)
                     .matching(BOOK_ISBN_01).createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -495,7 +495,7 @@ public class BookManager {
             org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().onField(FIELD_NAME_BOOK_ISBN)
                     .matching(BOOK_ISBN_01 + StringUtils.SPACE + BOOK_ISBN_02 + StringUtils.SPACE + BOOK_ISBN_03)
                     .createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -514,7 +514,7 @@ public class BookManager {
         FullTextSession fullTextSession = Search.getFullTextSession(HibernateUtil.getSessionFactory().openSession());
         fullTextSession.beginTransaction();
 
-        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Book.class).get();
+        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(ENTITY_TYPE).get();
 
         String delimiterLinePrefixBase = new Object() {
         }.getClass().getEnclosingMethod().getName();
@@ -537,7 +537,7 @@ public class BookManager {
                     .replace(BOOK_NAME_01.charAt(BOOK_NAME_01.length() - 2), '2');
             org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().fuzzy().onField(FIELD_NAME_BOOK_NAME)
                     .matching(bookName).createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -562,7 +562,7 @@ public class BookManager {
             String bookName = BOOK_NAME_01.replace(BOOK_NAME_01.charAt(1), '1');
             org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().fuzzy().withEditDistanceUpTo(1)
                     .onField(FIELD_NAME_BOOK_NAME).matching(bookName).createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -587,7 +587,7 @@ public class BookManager {
             String bookName = RandomStringUtils.randomAlphanumeric(prefixLength) + BOOK_NAME_01;
             org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().fuzzy().withPrefixLength(prefixLength)
                     .onField(FIELD_NAME_BOOK_NAME).matching(bookName).createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -606,7 +606,7 @@ public class BookManager {
         FullTextSession fullTextSession = Search.getFullTextSession(HibernateUtil.getSessionFactory().openSession());
         fullTextSession.beginTransaction();
 
-        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Book.class).get();
+        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(ENTITY_TYPE).get();
 
         String delimiterLinePrefixBase = new Object() {
         }.getClass().getEnclosingMethod().getName();
@@ -626,7 +626,7 @@ public class BookManager {
             String bookName = "x?x";
             org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().wildcard().onField(FIELD_NAME_BOOK_NAME)
                     .matching(bookName).createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -649,7 +649,7 @@ public class BookManager {
             String bookName = "xxx*";
             org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().wildcard().onField(FIELD_NAME_BOOK_NAME)
                     .matching(bookName).createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -670,7 +670,7 @@ public class BookManager {
             String bookName = "x?x?x*";
             org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().wildcard().onField(FIELD_NAME_BOOK_NAME)
                     .matching(bookName).createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -689,7 +689,7 @@ public class BookManager {
         FullTextSession fullTextSession = Search.getFullTextSession(HibernateUtil.getSessionFactory().openSession());
         fullTextSession.beginTransaction();
 
-        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Book.class).get();
+        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(ENTITY_TYPE).get();
 
         String delimiterLinePrefixBase = new Object() {
         }.getClass().getEnclosingMethod().getName();
@@ -707,7 +707,7 @@ public class BookManager {
             String bookName = BOOK_NAME_51;
             org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(FIELD_NAME_BOOK_NAME)
                     .sentence(bookName).createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -729,7 +729,7 @@ public class BookManager {
             String bookName = BOOK_NAME_51;
             org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().withSlop(2).onField(FIELD_NAME_BOOK_NAME)
                     .sentence(bookName).createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -748,7 +748,7 @@ public class BookManager {
         FullTextSession fullTextSession = Search.getFullTextSession(HibernateUtil.getSessionFactory().openSession());
         fullTextSession.beginTransaction();
 
-        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Book.class).get();
+        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(ENTITY_TYPE).get();
 
         String delimiterLinePrefixBase = new Object() {
         }.getClass().getEnclosingMethod().getName();
@@ -766,7 +766,7 @@ public class BookManager {
 
             org.apache.lucene.search.Query luceneQuery = queryBuilder.range().onField(FIELD_NAME_BOOK_PRICE).from(80.0D)
                     .to(90.0D).createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -789,7 +789,7 @@ public class BookManager {
 
             org.apache.lucene.search.Query luceneQuery = queryBuilder.range().onField(FIELD_NAME_BOOK_PRICE)
                     .above(80.0D).createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -812,7 +812,7 @@ public class BookManager {
 
             org.apache.lucene.search.Query luceneQuery = queryBuilder.range().onField(FIELD_NAME_BOOK_PRICE)
                     .below(90.0D).createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -831,7 +831,7 @@ public class BookManager {
         FullTextSession fullTextSession = Search.getFullTextSession(HibernateUtil.getSessionFactory().openSession());
         fullTextSession.beginTransaction();
 
-        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Book.class).get();
+        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(ENTITY_TYPE).get();
 
         String delimiterLinePrefixBase = new Object() {
         }.getClass().getEnclosingMethod().getName();
@@ -841,7 +841,7 @@ public class BookManager {
                 delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
 
         org.apache.lucene.search.Query luceneQuery = queryBuilder.all().createQuery();
-        FullTextQuery query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+        FullTextQuery query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
         CommonsUtil.showQueryString(query);
 
         int paginationPageSize = 15;
@@ -878,7 +878,7 @@ public class BookManager {
         FullTextSession fullTextSession = Search.getFullTextSession(HibernateUtil.getSessionFactory().openSession());
         fullTextSession.beginTransaction();
 
-        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Book.class).get();
+        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(ENTITY_TYPE).get();
 
         String delimiterLinePrefixBase = new Object() {
         }.getClass().getEnclosingMethod().getName();
@@ -889,7 +889,7 @@ public class BookManager {
 
         org.apache.lucene.search.Query luceneQuery = queryBuilder.range().onField(FIELD_NAME_BOOK_PRICE).above(50.0D)
                 .createQuery();
-        FullTextQuery query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+        FullTextQuery query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
         CommonsUtil.showQueryString(query);
 
         String sortFieldName = FIELD_NAME_BOOK_NAME;
@@ -912,7 +912,7 @@ public class BookManager {
         FullTextSession fullTextSession = Search.getFullTextSession(HibernateUtil.getSessionFactory().openSession());
         fullTextSession.beginTransaction();
 
-        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Book.class).get();
+        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(ENTITY_TYPE).get();
 
         String delimiterLinePrefixBase = new Object() {
         }.getClass().getEnclosingMethod().getName();
@@ -922,7 +922,7 @@ public class BookManager {
                 delimiterLinePrefixBase + CommonsUtil.DELIMITER_LINE_PREFIX_CONNECTOR + (++testCounter));
 
         org.apache.lucene.search.Query luceneQuery = queryBuilder.all().createQuery();
-        FullTextQuery query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+        FullTextQuery query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
         CommonsUtil.showQueryString(query);
 
         String sortFieldName1 = FIELD_NAME_BOOK_PRICE;
@@ -964,7 +964,7 @@ public class BookManager {
         FullTextSession fullTextSession = Search.getFullTextSession(HibernateUtil.getSessionFactory().openSession());
         fullTextSession.beginTransaction();
 
-        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Book.class).get();
+        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(ENTITY_TYPE).get();
 
         String delimiterLinePrefixBase = new Object() {
         }.getClass().getEnclosingMethod().getName();
@@ -981,7 +981,7 @@ public class BookManager {
             org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword()
                     .onFields(FIELD_NAME_BOOK_NAME, FIELD_NAME_BOOK_AUTHOR_NAME, FIELD_NAME_BOOK_INTRO)
                     .matching(BOOK_COMMON_VALUE_01).createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -1008,7 +1008,7 @@ public class BookManager {
             org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().onField(FIELD_NAME_BOOK_NAME)
                     .andField(FIELD_NAME_BOOK_AUTHOR_NAME).boostedTo(3.0F).andField(FIELD_NAME_BOOK_INTRO)
                     .matching(BOOK_COMMON_VALUE_01).createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -1027,7 +1027,7 @@ public class BookManager {
         FullTextSession fullTextSession = Search.getFullTextSession(HibernateUtil.getSessionFactory().openSession());
         fullTextSession.beginTransaction();
 
-        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Book.class).get();
+        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(ENTITY_TYPE).get();
 
         String delimiterLinePrefixBase = new Object() {
         }.getClass().getEnclosingMethod().getName();
@@ -1048,7 +1048,7 @@ public class BookManager {
                     .matching(BOOK_PRICE_11).createQuery();
             org.apache.lucene.search.Query luceneQuery = queryBuilder.bool().must(luceneSubquery1).must(luceneSubquery2)
                     .createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -1074,7 +1074,7 @@ public class BookManager {
                     .matching(BOOK_PRICE_11).createQuery();
             org.apache.lucene.search.Query luceneQuery = queryBuilder.bool().should(luceneSubquery1)
                     .should(luceneSubquery2).createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -1100,7 +1100,7 @@ public class BookManager {
                     .matching(BOOK_PRICE_11).createQuery();
             org.apache.lucene.search.Query luceneQuery = queryBuilder.bool().must(luceneSubquery1).must(luceneSubquery2)
                     .not().createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -1121,7 +1121,7 @@ public class BookManager {
                             + MESSAGE_TEXT_USING_THE_ALL_METHOD_FOR_AN_ALL_QUERY);
 
             org.apache.lucene.search.Query luceneQuery = queryBuilder.all().createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -1144,7 +1144,7 @@ public class BookManager {
             org.apache.lucene.search.Query luceneSubquery = queryBuilder.range().onField(FIELD_NAME_BOOK_PRICE)
                     .below(BOOK_PRICE_02).createQuery();
             org.apache.lucene.search.Query luceneQuery = queryBuilder.all().except(luceneSubquery).createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -1180,7 +1180,7 @@ public class BookManager {
         FullTextSession fullTextSession = Search.getFullTextSession(HibernateUtil.getSessionFactory().openSession());
         fullTextSession.beginTransaction();
 
-        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Book.class).get();
+        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(ENTITY_TYPE).get();
 
         String delimiterLinePrefixBase = new Object() {
         }.getClass().getEnclosingMethod().getName();
@@ -1192,7 +1192,7 @@ public class BookManager {
 
             org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(FIELD_NAME_A).sentence(VALUE_A1)
                     .createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -1209,7 +1209,7 @@ public class BookManager {
 
             org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(FIELD_NAME_A).sentence(VALUE_A2)
                     .createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -1226,7 +1226,7 @@ public class BookManager {
 
             org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(FIELD_NAME_A).sentence(VALUE_A3)
                     .createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -1243,7 +1243,7 @@ public class BookManager {
 
             org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(FIELD_NAME_B).sentence(VALUE_B1)
                     .createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -1260,7 +1260,7 @@ public class BookManager {
 
             org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(FIELD_NAME_B).sentence(VALUE_B2)
                     .createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -1277,7 +1277,7 @@ public class BookManager {
 
             org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(FIELD_NAME_B).sentence(VALUE_B3)
                     .createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -1294,7 +1294,7 @@ public class BookManager {
 
             org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(FIELD_NAME_C).sentence(VALUE_C1)
                     .createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -1311,7 +1311,7 @@ public class BookManager {
 
             org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(FIELD_NAME_C).sentence(VALUE_C2)
                     .createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -1328,7 +1328,7 @@ public class BookManager {
 
             org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(FIELD_NAME_C).sentence(VALUE_C3)
                     .createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -1358,7 +1358,7 @@ public class BookManager {
         FullTextSession fullTextSession = Search.getFullTextSession(HibernateUtil.getSessionFactory().openSession());
         fullTextSession.beginTransaction();
 
-        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Book.class).get();
+        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(ENTITY_TYPE).get();
 
         String delimiterLinePrefixBase = new Object() {
         }.getClass().getEnclosingMethod().getName();
@@ -1371,7 +1371,7 @@ public class BookManager {
 
             org.apache.lucene.search.Query luceneQuery = queryBuilder.phrase().onField(FIELD_NAME_BOOK_AWARDED)
                     .sentence(String.valueOf(NumberUtils.INTEGER_ONE)).createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -1390,7 +1390,7 @@ public class BookManager {
         FullTextSession fullTextSession = Search.getFullTextSession(HibernateUtil.getSessionFactory().openSession());
         fullTextSession.beginTransaction();
 
-        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Book.class).get();
+        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(ENTITY_TYPE).get();
 
         String delimiterLinePrefixBase = new Object() {
         }.getClass().getEnclosingMethod().getName();
@@ -1405,7 +1405,7 @@ public class BookManager {
 
             org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().onField(FIELD_NAME_BOOK_AUTHOR_NAME)
                     .matching(BOOK_AUTHOR_NAME_02).createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -1431,7 +1431,7 @@ public class BookManager {
                     .matching("~b02`c03!").createQuery();
             org.apache.lucene.search.Query luceneQuery = queryBuilder.bool().must(luceneSubquery1).must(luceneSubquery2)
                     .createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -1457,7 +1457,7 @@ public class BookManager {
                     .matching(BOOK_REMARKS_01).createQuery();
             org.apache.lucene.search.Query luceneQuery = queryBuilder.bool().must(luceneSubquery1).must(luceneSubquery2)
                     .createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -1484,7 +1484,7 @@ public class BookManager {
                     .matching("a27").createQuery();
             org.apache.lucene.search.Query luceneQuery = queryBuilder.bool().must(luceneSubquery1).must(luceneSubquery2)
                     .must(luceneSubquery3).createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -1512,7 +1512,7 @@ public class BookManager {
                     .matching("do").createQuery();
             org.apache.lucene.search.Query luceneQuery = queryBuilder.bool().must(luceneSubquery1).must(luceneSubquery2)
                     .createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -1538,7 +1538,7 @@ public class BookManager {
                     .matching("refactor").createQuery();
             org.apache.lucene.search.Query luceneQuery = queryBuilder.bool().must(luceneSubquery1).must(luceneSubquery2)
                     .createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -1557,7 +1557,7 @@ public class BookManager {
         FullTextSession fullTextSession = Search.getFullTextSession(HibernateUtil.getSessionFactory().openSession());
         fullTextSession.beginTransaction();
 
-        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Book.class).get();
+        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(ENTITY_TYPE).get();
 
         String delimiterLinePrefixBase = new Object() {
         }.getClass().getEnclosingMethod().getName();
@@ -1576,7 +1576,7 @@ public class BookManager {
                     .matching(BOOK_PRICE_21).createQuery();
             org.apache.lucene.search.Query luceneQuery = queryBuilder.bool().should(luceneSubquery1)
                     .should(luceneSubquery2).createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -1601,7 +1601,7 @@ public class BookManager {
                     .onField(FIELD_NAME_BOOK_PRICE).matching(BOOK_PRICE_21).createQuery();
             org.apache.lucene.search.Query luceneQuery = queryBuilder.bool().should(luceneSubquery1)
                     .should(luceneSubquery2).createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -1622,7 +1622,7 @@ public class BookManager {
             org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().onField(FIELD_NAME_BOOK_NAME)
                     .andField(FIELD_NAME_BOOK_AUTHOR_NAME).andField(FIELD_NAME_BOOK_INTRO)
                     .matching(BOOK_COMMON_VALUE_11).createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -1643,7 +1643,7 @@ public class BookManager {
             org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().onField(FIELD_NAME_BOOK_NAME)
                     .andField(FIELD_NAME_BOOK_AUTHOR_NAME).boostedTo(5.0F).andField(FIELD_NAME_BOOK_INTRO)
                     .matching(BOOK_COMMON_VALUE_11).createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -1662,7 +1662,7 @@ public class BookManager {
         FullTextSession fullTextSession = Search.getFullTextSession(HibernateUtil.getSessionFactory().openSession());
         fullTextSession.beginTransaction();
 
-        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Book.class).get();
+        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(ENTITY_TYPE).get();
 
         String delimiterLinePrefixBase = new Object() {
         }.getClass().getEnclosingMethod().getName();
@@ -1681,7 +1681,7 @@ public class BookManager {
                     .matching(BOOK_PRICE_21).createQuery();
             org.apache.lucene.search.Query luceneQuery = queryBuilder.bool().should(luceneSubquery1)
                     .should(luceneSubquery2).createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();
@@ -1706,7 +1706,7 @@ public class BookManager {
                     .onField(FIELD_NAME_BOOK_PRICE).matching(BOOK_PRICE_21).createQuery();
             org.apache.lucene.search.Query luceneQuery = queryBuilder.bool().should(luceneSubquery1)
                     .should(luceneSubquery2).createQuery();
-            Query query = fullTextSession.createFullTextQuery(luceneQuery, Book.class);
+            Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
             CommonsUtil.showQueryString(query);
 
             List<Book> queryResults = query.list();

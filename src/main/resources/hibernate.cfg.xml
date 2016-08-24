@@ -54,9 +54,11 @@
         <property name="hibernate.search.default.directory_provider">filesystem</property>
         <!-- A directory named as the following "value" attribute will be automatically created when the application starts, at the User Working Directory (System.getProperty("user.dir")). -->
         <property name="hibernate.search.default.indexBase">lucene/indexes</property>
+        <!-- <property name="hibernate.search.analyzer">org.apache.lucene.analysis.standard.StandardAnalyzer</property> -->
 
         <mapping resource="Book.hbm.xml" />
         <mapping resource="Publisher.hbm.xml" />
+        <mapping resource="SomeObject.hbm.xml" />
         <mapping resource="Product.hbm.xml" />
     </session-factory>
 </hibernate-configuration>

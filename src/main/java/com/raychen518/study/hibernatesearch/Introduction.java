@@ -29,11 +29,18 @@ package com.raychen518.study.hibernatesearch;
  * =================
  * Hibernate Search is a Java framework which offers full-text search support by combining the power of Hibernate and Apache Lucene.
  * 
+ * Here is a list of usages and their corresponding references.
+ * Usages                   Reference
+ * -----------------------------------------------------------------------------
+ * Basic usages             The Book, BookManager and other related classes
+ * Analyzers' usages        The SomeObject, SomeObjectManager and other related classes
+ * 
  * =================
  * Steps to Use
  * =================
  * Here are the normal steps to use Hibernate Search with corresponding code examples.
- * Note: These steps do not cover all approaches to use Hibernate Search.
+ * Note: These steps do not cover all basic usages of Hibernate Search.
+ * 
  * 01. Introduce the Hibernate Search dependency in the POM file.
  *     pom.xml
  *     -------------------------------------------------------------------------
