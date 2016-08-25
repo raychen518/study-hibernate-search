@@ -32,6 +32,11 @@ public class SomeObjectManager {
     private static final String FIELD_VALUE_FIELD_1_01 = "Abc01-Def02@Ghi03#Jkl04&Mno05(Pqr06)Stu07";
 
     // =================================
+    // Message Texts
+    // =================================
+    private static final String MESSAGE_TEXT_FIELD_VALUE_LABEL = "fieldValue: ";
+
+    // =================================
     // Misc
     // =================================
     private static final Class<?> ENTITY_TYPE = SomeObject.class;
@@ -136,7 +141,7 @@ public class SomeObjectManager {
             org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().onField(FIELD_NAME_FIELD_1)
                     .matching(fieldValue).createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
-            System.out.println("fieldValue: " + fieldValue);
+            System.out.println(MESSAGE_TEXT_FIELD_VALUE_LABEL + fieldValue);
             CommonsUtil.showQueryString(query);
 
             List<SomeObject> queryResults = query.list();
@@ -155,7 +160,7 @@ public class SomeObjectManager {
             org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().onField(FIELD_NAME_FIELD_1)
                     .matching(fieldValue).createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
-            System.out.println("fieldValue: " + fieldValue);
+            System.out.println(MESSAGE_TEXT_FIELD_VALUE_LABEL + fieldValue);
             CommonsUtil.showQueryString(query);
 
             List<SomeObject> queryResults = query.list();
@@ -174,7 +179,7 @@ public class SomeObjectManager {
             org.apache.lucene.search.Query luceneQuery = queryBuilder.keyword().onField(FIELD_NAME_FIELD_1)
                     .matching(fieldValue).createQuery();
             Query query = fullTextSession.createFullTextQuery(luceneQuery, ENTITY_TYPE);
-            System.out.println("fieldValue: " + fieldValue);
+            System.out.println(MESSAGE_TEXT_FIELD_VALUE_LABEL + fieldValue);
             CommonsUtil.showQueryString(query);
 
             List<SomeObject> queryResults = query.list();

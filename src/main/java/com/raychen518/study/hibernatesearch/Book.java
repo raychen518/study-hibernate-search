@@ -32,16 +32,40 @@ import org.hibernate.search.annotations.TokenizerDef;
                 @Parameter(name = "language", value = "English") }) })
 public class Book {
 
+    /**
+     * <pre>
+     * The Above @Indexed Annotation on This Class
+     * - To mark the entity to be indexed as the document, using the @Indexed annotation.
+     * </pre>
+     */
+
+    /**
+     * <pre>
+     * The Above @AnalyzerDef Annotation on This Class
+     * - To define analyzers on the entity, using the @AnalyzerDef / @AnalyzerDefs annotation.
+     * 
+     * - Here, an analyzer named "remarksAnalyzer" is defined.
+     *   It contains the StandardTokenizer tokenizer, the LowerCaseFilter and SnowballPorterFilter filters.
+     * </pre>
+     */
+
+    /**
+     * <pre>
+     * To mark the entity field as the document identifier, using the @Id or @DocumentId annotation.
+     * </pre>
+     */
     @Id
     private Long id;
 
     /**
      * <pre>
-     * Properties of the @Field Annotation
-     * - The "index" property specifies whether the field value should be indexed.
-     * - The "analyze" property specifies whether the field value should be analyzed.
-     * - The "store" property specifies whether the field value should be stored.
-     * - The "index = Index.YES", "analyze = Analyze.YES" and "store = Store.NO" settings are the default settings.
+     * - To mark the entity field as a document field, using the @Field annotation.
+     * 
+     * - About Properties of the @Field Annotation
+     *   - The "index" property specifies whether the field value should be indexed.
+     *   - The "analyze" property specifies whether the field value should be analyzed.
+     *   - The "store" property specifies whether the field value should be stored.
+     *   - The "index = Index.YES", "analyze = Analyze.YES" and "store = Store.NO" settings are the default settings.
      * </pre>
      */
     @Field
@@ -49,7 +73,7 @@ public class Book {
 
     /**
      * <pre>
-     * To make a field sortable, the @SortableField annotation should be used on that field.
+     * To mark the document field sortable, using the @SortableField annotation.
      * </pre>
      */
     @Field(store = Store.YES)
@@ -65,7 +89,9 @@ public class Book {
 
     /**
      * <pre>
-     * A custom field bridge implementation - BookIntroBridge is used here to change the intro to be indexed.
+     * - To specify the document field' field bridge implementation, using the @FieldBridge / @DateBridge / etc. annotation.
+     * 
+     * - Here, a custom field bridge implementation - BookIntroBridge is used to change the "intro" value to be indexed.
      * </pre>
      */
     @Field(store = Store.YES)
@@ -74,35 +100,47 @@ public class Book {
 
     /**
      * <pre>
-     * - By default, the name of the field (document index) is set using the name of the annotated entity field,
+     * - By default, the name of the document field is set using the name of the entity field,
      *   but it can be changed by setting the "name" attribute of the @Field annotation.
      * 
-     *   Here, this field's name will be set as "publicationTime" instead of the default "publicationDate".
+     *   Here, the document field's name is set as "publicationTime" instead of the default "publicationDate" from the entity field.
      * 
-     * - A built-in field bridge implementation - DateBridge is used here
+     * - Here, a built-in field bridge implementation - DateBridge is used
      *   to define this Date field's resolution to second (Resolution.SECOND) instead of the default millisecond (Resolution.MILLISECOND).
      * 
      *   In other words, here, the millisecond part of this Date field is ignored in the indexing.
      * 
      *   To be more specific, assuming the number of milliseconds of this Date field is 1259752333267 (2009-12-02 19:12:13.267) here,
-     *   then this Date field's value in the indexes will be 1259752333000 (the millisecond part (267) is ignored).
+     *   then this Date field's value in the index will be 1259752333000 (the millisecond part (267) is ignored).
      * </pre>
      */
     @Field(name = "publicationTime")
     @DateBridge(resolution = Resolution.SECOND)
     private Date publicationDate;
 
+    /**
+     * <pre>
+     * Here, a custom field bridge implementation - BookAwardedBridge is used to change the "awarded" value to be indexed.
+     * </pre>
+     */
     @Field(store = Store.YES)
     @FieldBridge(impl = BookAwardedBridge.class)
     private boolean awarded;
 
+    /**
+     * <pre>
+     * - To use an analyzer on the document field, using the @Analyzer annotation.
+     * 
+     * - Here, a custom analyzer named "remarksAnalyzer" is used to analyze the "remarks" value.
+     * </pre>
+     */
     @Field(store = Store.YES)
     @Analyzer(definition = "remarksAnalyzer")
     private String remarks;
 
     /**
      * <pre>
-     * To make an associations field to be indexed, the @IndexedEmbedded annotation should be used on that field.
+     * To mark the entity field as an association, using the @IndexedEmbedded annotation.
      * </pre>
      */
     @IndexedEmbedded

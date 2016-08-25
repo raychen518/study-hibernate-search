@@ -58,21 +58,21 @@ package com.raychen518.study.hibernatesearch;
  *     <property name="hibernate.search.default.indexBase">lucene/indexes</property>
  *     -------------------------------------------------------------------------
  * 
- * 03. Mark the entities to be indexed by Hibernate Search, using the @Indexed annotation.
+ * 03. Mark the entities to be indexed by Hibernate Search as the documents, using the @Indexed annotation.
  *     Book.java
  *     -------------------------------------------------------------------------
  *-    @Indexed
  *     public class Book {
  *     -------------------------------------------------------------------------
  * 
- * 04. Mark the entity fields to be indexed by Hibernate Search as the entity identifiers, using the @Id or @DocumentId annotation.
+ * 04. Mark the entity fields as document identifiers, using the @Id or @DocumentId annotation.
  *     Book.java
  *     -------------------------------------------------------------------------
  *-    @Id
  *     private Long id;
  *     -------------------------------------------------------------------------
  * 
- * 05. Mark the entity fields to be indexed by Hibernate Search, using the @Field annotation.
+ * 05. Mark the entity fields as document fields, using the @Field annotation.
  *     Book.java
  *     -------------------------------------------------------------------------
  *-    @Field
@@ -82,14 +82,14 @@ package com.raychen518.study.hibernatesearch;
  *     private String name;
  *     -------------------------------------------------------------------------
  * 
- * 06. (if necessary) Mark the entity fields to be indexed by Hibernate Search as the entity associations, using the @IndexedEmbedded annotation.
+ * 06. (if necessary) Mark the entity fields as associations, using the @IndexedEmbedded annotation.
  *     Book.java
  *     -------------------------------------------------------------------------
  *-    @IndexedEmbedded
  *     private Publisher publisher;
  *     -------------------------------------------------------------------------
  * 
- * 07. (if necessary) Specify the entity fields' field bridge implementations for data encoding in Hibernate Search, using the @FieldBridge / @DateBridge / etc. annotation.
+ * 07. (if necessary) Specify the document fields' field bridge implementations for data encoding, using the @FieldBridge / @DateBridge / etc. annotation.
  *     Book.java
  *     -------------------------------------------------------------------------
  *-    @Field
@@ -101,7 +101,7 @@ package com.raychen518.study.hibernatesearch;
  *     private Date publicationDate;
  *     -------------------------------------------------------------------------
  * 
- * 08. (if necessary) Mark the entity fields sortable in Hibernate Search, using the @SortableField annotation.
+ * 08. (if necessary) Mark the document fields sortable, using the @SortableField annotation.
  *     Book.java
  *     -------------------------------------------------------------------------
  *-    @Field
@@ -260,6 +260,18 @@ package com.raychen518.study.hibernatesearch;
  * 
  * Apache - Apache Lucene
  * https://lucene.apache.org/
+ * 
+ * Stack Overflow - Hibernate Search Query Searches All Tables Instead of Only the Specified Class' Table
+ * http://stackoverflow.com/questions/38072423/hibernate-search-query-searches-all-tables-instead-of-only-the-specified-class
+ * 
+ * Stack Overflow - Can the @Id and @DocumentId Annotations Be Specified on Different Fields?
+ * http://stackoverflow.com/questions/38090502/can-the-id-and-documentid-annotations-be-specified-on-different-fields
+ * 
+ * Stack Overflow - Why Document Fields Still Have Uppercase Characters after Using LowerCaseFilterFactory?
+ * http://stackoverflow.com/questions/39115365/why-document-fields-still-have-uppercase-characters-after-using-lowercasefilterf
+ * 
+ * Stack Overflow - Stemming Search Using SnowballPorterFilterFactory Seems to Return Less Results
+ * http://stackoverflow.com/questions/39113063/stemming-search-using-snowballporterfilterfactory-seems-to-return-less-results
  * </pre>
  */
 public interface Introduction {
